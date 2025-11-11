@@ -23,35 +23,3 @@ INSERT INTO global_annual_temperatures (
 (2022, 14.67), (2023, 14.97), (2024, 15.09), (2025, 15.24);
 
 
-LOAD DATA INFILE 'E:/xampp/mysql/files/sea-surface-temperature-anomaly.csv'
-INTO TABLE global_annual_sst_anomalies
-CHARACTER SET utf8mb4
-FIELDS TERMINATED BY ','
-OPTIONALLY ENCLOSED BY '"'
-LINES TERMINATED BY '\n'
-IGNORE 1 ROWS
-(@entity, @code, @year, @sst, @lower, @upper)
-SET
-  region_entity = @entity,
-  measurement_year = CAST(@year AS SIGNED),
-  sst_anomaly_celsius = CAST(@sst AS DECIMAL(5,3)),
-  anomaly_lower_bound = CAST(@lower AS DECIMAL(5,3)),
-  anomaly_upper_bound = CAST(@upper AS DECIMAL(5,3));
-
-
-
-
-LOAD DATA INFILE 'E:/xampp/mysql/files/co2-long-term-concentration.csv'
-INTO TABLE co2_concentration
-CHARACTER SET utf8mb4
-FIELDS TERMINATED BY ','
-OPTIONALLY ENCLOSED BY '"'
-LINES TERMINATED BY '\n'
-IGNORE 1 ROWS
-(@entity, @code, @year, @co2)
-SET
-  year = CAST(@year AS SIGNED),
-  co2_ppm = CAST(@co2 AS DECIMAL(6,3));
-
-
-
