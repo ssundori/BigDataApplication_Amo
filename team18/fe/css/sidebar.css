@@ -1,0 +1,116 @@
+/* ==================================== */
+/* 1. 사이드바 기본 구조 및 스타일 */
+/* ==================================== */
+.sidebar {
+    background-color: var(--color-primary); /* #004D40 */
+    color: var(--color-text-light); /* 텍스트는 흰색 */
+    
+    /* 화면 좌측에 고정 */
+    position: fixed; 
+    top: 0;
+    left: 0;
+    z-index: 100;
+
+    /* 너비 설정 및 숨김 처리 */
+    width: 250px; 
+    height: 100vh;
+    overflow: hidden; /* 내용이 완전히 사라지도록 */
+    
+    display: flex;
+    flex-direction: column;
+    padding: var(--spacing-lg) 0;
+
+    /* 애니메이션 설정 */
+    transition: width 0.3s ease; 
+}
+
+/* ==================================== */
+/* 2. 사이드바가 완전히 닫힌 상태 (JS가 body에 클래스 추가) */
+/* ==================================== */
+body.sidebar-closed .sidebar {
+    width: 0; /* 너비를 0으로 만들고 */
+    padding: 0;
+}
+
+
+/* ==================================== */
+/* 3. 토글 버튼 (사이드바 외부, 고정 위치) */
+/* ==================================== */
+
+/* 토글 버튼 컨테이너: 사이드바 외부에서 관리 */
+.sidebar-toggle-container {
+    position: fixed; /* 화면 상단에 고정 */
+    top: 20px;
+    left: 20px; 
+    z-index: 200; /* 사이드바 위에 위치 */
+    transition: left 0.3s ease;
+}
+
+/* 토글 버튼 스타일 */
+.sidebar-toggle-btn {
+    width: 40px;
+    height: 40px;
+    border-radius: var(--border-radius);
+    background-color: var(--color-accent); /* #8BC34A */
+    color: var(--color-text-light);
+    border: none;
+    cursor: pointer;
+    font-size: 1.2rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: var(--box-shadow);
+}
+
+/* 사이드바가 열렸을 때 (토글 버튼을 오른쪽으로 밀기) */
+.sidebar-toggle-container.sidebar-open {
+    left: 270px; /* 사이드바 너비(250px) + 여백(20px) 만큼 이동 */
+}
+
+/* ==================================== */
+/* 4. 사이드바 내부 요소  */
+/* ==================================== */
+
+/* 토글 버튼 영역 */
+.sidebar-footer {
+    padding: var(--spacing-md) var(--spacing-lg);
+    text-align: right;
+}
+
+/* 토글 버튼 자체 (화살표 버튼) */
+.sidebar-toggle-btn {
+    /* 배경색은 딥 그린과 유사하게, 글자색은 흰색 */
+    background: none;
+    border: none;
+    color: var(--color-text-light);
+    cursor: pointer;
+    font-size: 1.2rem;
+    transition: transform 0.3s ease;
+}
+
+/* 사이드바가 접혔을 때의 상태 */
+.sidebar.collapsed {
+    width: 60px; /* 접혔을 때 너비 */
+    min-width: 60px;
+}
+
+/* 접혔을 때 메뉴 텍스트 숨기기 */
+.sidebar.collapsed .sidebar-header,
+.sidebar.collapsed .sidebar-nav .btn-nav span {
+    display: none;
+}
+
+/* 접혔을 때 토글 버튼 회전 (화살표 방향 변경 시 사용) */
+.sidebar.collapsed .sidebar-toggle-btn {
+    transform: rotate(180deg);
+}
+
+
+/* ==================================== */
+/* 5. 메인 콘텐츠 영역 (사이드바 옆 공간) */
+/* ==================================== */
+.main-content {
+    flex-grow: 1; 
+    padding: var(--spacing-lg);
+    overflow-y: auto; 
+}
