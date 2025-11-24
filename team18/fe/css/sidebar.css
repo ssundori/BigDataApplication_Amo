@@ -2,115 +2,151 @@
 /* 1. 사이드바 기본 구조 및 스타일 */
 /* ==================================== */
 .sidebar {
-    background-color: var(--color-primary); /* #004D40 */
-    color: var(--color-text-light); /* 텍스트는 흰색 */
+    background-color: var(--color-primary);
+    color: var(--color-text-light); 
     
-    /* 화면 좌측에 고정 */
     position: fixed; 
     top: 0;
     left: 0;
     z-index: 100;
 
-    /* 너비 설정 및 숨김 처리 */
-    width: 250px; 
+    width: var(--sidebar-width);
     height: 100vh;
-    overflow: hidden; /* 내용이 완전히 사라지도록 */
     
     display: flex;
     flex-direction: column;
     padding: var(--spacing-lg) 0;
 
-    /* 애니메이션 설정 */
-    transition: width 0.3s ease; 
+    transition: width 0.3s ease, left 0.3s ease; 
 }
 
 /* ==================================== */
-/* 2. 사이드바가 완전히 닫힌 상태 (JS가 body에 클래스 추가) */
+/* 2. 사이드바가 접힌 상태 */
 /* ==================================== */
-body.sidebar-closed .sidebar {
-    width: 0; /* 너비를 0으로 만들고 */
-    padding: 0;
+.sidebar.collapsed {
+    width: var(--sidebar-collapsed-width);
+    overflow: hidden;
 }
 
 
 /* ==================================== */
-/* 3. 토글 버튼 (사이드바 외부, 고정 위치) */
+/* 3. 메인 콘텐츠 영역 */
 /* ==================================== */
-
-/* 토글 버튼 컨테이너: 사이드바 외부에서 관리 */
-.sidebar-toggle-container {
-    position: fixed; /* 화면 상단에 고정 */
-    top: 20px;
-    left: 20px; 
-    z-index: 200; /* 사이드바 위에 위치 */
-    transition: left 0.3s ease;
+.main-content {
+    padding: var(--spacing-lg);
+    overflow-y: auto;
+    min-height: 100vh;
+    
+    margin-left: var(--sidebar-width); 
+    transition: margin-left 0.3s ease; 
+    
+    width: auto;
 }
 
-/* 토글 버튼 스타일 */
-.sidebar-toggle-btn {
-    width: 40px;
-    height: 40px;
-    border-radius: var(--border-radius);
-    background-color: var(--color-accent); /* #8BC34A */
+.sidebar.collapsed ~ .main-content {
+    margin-left: var(--sidebar-collapsed-width);
+}
+
+/* ==================================== */
+/* 4. 사이드바 내부 요소*/
+/* ==================================== */
+.sidebar-header {
+    padding: var(--spacing-md) var(--spacing-lg);
+    margin-bottom: var(--spacing-lg);
+    text-align: center;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    white-space: nowrap;
+    overflow: hidden;
+}
+
+.sidebar-login-section {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: var(--spacing-md) var(--spacing-lg);
+    margin-bottom: var(--spacing-lg);
+}
+
+.sidebar-login-link {
     color: var(--color-text-light);
-    border: none;
-    cursor: pointer;
-    font-size: 1.2rem;
+    text-decoration: none;
+    font-weight: bold;
     display: flex;
     align-items: center;
-    justify-content: center;
-    box-shadow: var(--box-shadow);
+    gap: var(--spacing-sm);
+    font-size: 0.9rem;
+    white-space: nowrap;
 }
 
-/* 사이드바가 열렸을 때 (토글 버튼을 오른쪽으로 밀기) */
-.sidebar-toggle-container.sidebar-open {
-    left: 270px; /* 사이드바 너비(250px) + 여백(20px) 만큼 이동 */
+.sidebar-nav {
+    flex-grow: 1; 
+    padding: 0;
+    list-style: none;
+    overflow-y: auto;
+    overflow-x: hidden;
 }
 
-/* ==================================== */
-/* 4. 사이드바 내부 요소  */
-/* ==================================== */
-
-/* 토글 버튼 영역 */
-.sidebar-footer {
+.sidebar-nav-item {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-md);
     padding: var(--spacing-md) var(--spacing-lg);
-    text-align: right;
+    color: var(--color-text-light);
+    text-decoration: none;
+    transition: background-color 0.2s;
+    white-space: nowrap;
 }
 
-/* 토글 버튼 자체 (화살표 버튼) */
+.sidebar-nav-item i {
+    font-size: 1.2rem;
+    width: 20px; 
+    text-align: center;
+}
+
+.sidebar-nav-item:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+.sidebar-nav-item.active {
+    background-color: var(--color-accent);
+    font-weight: bold;
+    box-shadow: inset 3px 0 0 var(--color-surface);
+}
+
+.sidebar.collapsed .sidebar-header h3,
+.sidebar.collapsed .sidebar-nav-item span,
+.sidebar.collapsed .sidebar-login-link {
+    opacity: 0;
+    width: 0;
+    visibility: hidden;
+    transition: opacity 0.1s, width 0.1s;
+}
+
+.sidebar.collapsed .sidebar-nav-item {
+    justify-content: center;
+    padding: var(--spacing-md);
+}
+.sidebar.collapsed .sidebar-nav-item i {
+    width: auto;
+}
+
+.sidebar.collapsed .sidebar-login-section {
+    justify-content: center;
+    padding: var(--spacing-md);
+}
+
 .sidebar-toggle-btn {
-    /* 배경색은 딥 그린과 유사하게, 글자색은 흰색 */
     background: none;
-    border: none;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    border-radius: 4px;
     color: var(--color-text-light);
     cursor: pointer;
     font-size: 1.2rem;
+    padding: 4px;
+    line-height: 1;
     transition: transform 0.3s ease;
 }
 
-/* 사이드바가 접혔을 때의 상태 */
-.sidebar.collapsed {
-    width: 60px; /* 접혔을 때 너비 */
-    min-width: 60px;
-}
-
-/* 접혔을 때 메뉴 텍스트 숨기기 */
-.sidebar.collapsed .sidebar-header,
-.sidebar.collapsed .sidebar-nav .btn-nav span {
-    display: none;
-}
-
-/* 접혔을 때 토글 버튼 회전 (화살표 방향 변경 시 사용) */
-.sidebar.collapsed .sidebar-toggle-btn {
+.sidebar.collapsed .sidebar-toggle-btn i {
     transform: rotate(180deg);
-}
-
-
-/* ==================================== */
-/* 5. 메인 콘텐츠 영역 (사이드바 옆 공간) */
-/* ==================================== */
-.main-content {
-    flex-grow: 1; 
-    padding: var(--spacing-lg);
-    overflow-y: auto; 
 }
