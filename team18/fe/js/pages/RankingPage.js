@@ -1,82 +1,188 @@
+// fe/js/pages/RankingPage.js
+
+import { fetchData } from '../../utils/api.js';
+
+/**
+ * 랭킹 테이블을 렌더링합니다.
+ */
+function renderRankingResults(data, rankByLabel, title) {
+    const container = document.getElementById('ranking-table-container');
+    const titleElement = document.getElementById('ranking-results-title');
+
+    titleElement.textContent = title;
+    
+    if (!data || data.length === 0) {
+        container.innerHTML = `<p style="text-align: center; color: #6C757D; padding: 30px;">조회된 랭킹 데이터가 없습니다.</p>`;
+        return;
+    }
+    
+    const tableHtml = `
+        <table style="width: 100%; border-collapse: collapse; margin-top: 20px; font-size: 0.95rem;">
+            <thead>
+                <tr style="background-color: #e9ecef;">
+                    <th style="padding: 10px; border: 1px solid #ddd; text-align: left; width: 50px;">Rank</th>
+                    <th style="padding: 10px; border: 1px solid #ddd; text-align: left;">Country</th>
+                    <th style="padding: 10px; border: 1px solid #ddd; text-align: left;">Disaster Type</th>
+                    <th style="padding: 10px; border: 1px solid #ddd; text-align: right;">Value (${rankByLabel})</th>
+                </tr>
+            </thead>
+            <tbody>
+                ${data.map(item => `
+                    <tr>
+                        <td style="padding: 10px; border: 1px solid #ddd;">${item.rank}</td>
+                        <td style="padding: 10px; border: 1px solid #ddd;">${item.country_name}</td>
+                        <td style="padding: 10px; border: 1px solid #ddd;">${item.disaster_type}</td>
+                        <td style="padding: 10px; border: 1px solid #ddd; text-align: right;">${item.measure_value.toLocaleString()}</td>
+                    </tr>
+                `).join('')}
+            </tbody>
+        </table>
+    `;
+    container.innerHTML = tableHtml;
+}
+
+async function fetchRankingData(params, rankByLabel) {
+    const container = document.getElementById('ranking-table-container');
+    container.innerHTML = '<p style="text-align: center; color: var(--color-primary); padding: 30px;"><i class="fas fa-spinner fa-spin"></i> 데이터를 불러오는 중...</p>';
+    
+    // api.js의 mock 데이터 또는 실제 백엔드 호출
+    const result = await fetchData('analysis/ranking.php', params);
+
+    if (result.success) { // status 대신 success 체크
+        const title = `Top ${result.meta.total_records} Disasters by ${rankByLabel} (${result.meta.range})`;
+        renderRankingResults(result.data, rankByLabel, title);
+    } else {
+        container.innerHTML = `<p style="text-align: center; color: #DC3545; padding: 30px;">오류: ${result.error?.message || '데이터 조회 실패'}</p>`;
+        document.getElementById('ranking-results-title').textContent = '데이터 조회 실패';
+    }
+}
+
+function setupEventListeners() {
+    const form = document.getElementById('ranking-filter-form');
+    if (form) {
+        form.addEventListener('submit', (event) => {
+            event.preventDefault();
+
+            const rankBy = document.getElementById('rank-by').value;
+            const startYear = document.getElementById('start-year').value;
+            const endYear = document.getElementById('end-year').value;
+            const continentId = document.getElementById('continent-id').value;
+            const disasterTypeId = document.getElementById('disaster-type-id').value;
+
+            const params = {
+                rank_by: rankBy,
+                start_year: parseInt(startYear),
+                end_year: parseInt(endYear),
+                continent_id: continentId ? parseInt(continentId) : undefined,
+                disaster_type_id: disasterTypeId ? parseInt(disasterTypeId) : undefined,
+            };
+
+            const rankByLabelMap = {
+                'total_deaths': 'Total Deaths',
+                'total_affected': 'Total Affected',
+                'total_damage_thousand_usd': 'Total Damage (USD)'
+            };
+            const rankByLabel = rankByLabelMap[rankBy] || rankBy;
+
+            fetchRankingData(params, rankByLabel);
+        });
+    }
+}
+
+export async function populateFilters() {
+    const continentSelect = document.getElementById('continent-id');
+    const disasterSelect = document.getElementById('disaster-type-id');
+
+    try {
+        const contData = await fetchData('common/continents.php');
+        if (contData && contData.success) {
+            let html = '<option value="">All Continent</option>';
+            contData.data.forEach(c => {
+                html += `<option value="${c.id}">${c.name}</option>`;
+            });
+            if(continentSelect) continentSelect.innerHTML = html;
+        }
+
+        const typeData = await fetchData('common/disaster_types.php');
+        if (typeData && typeData.success) {
+            let html = '<option value="">All Type</option>';
+            typeData.data.forEach(d => {
+                html += `<option value="${d.id}">${d.type} (${d.group})</option>`;
+            });
+            if(disasterSelect) disasterSelect.innerHTML = html;
+        }
+
+    } catch (e) {
+        console.error("Filter Load Error", e);
+    }
+}
+
 export function render() {
-    return `
-        <div class="page-header">
-            <h1 style="color: var(--color-primary);">Global Disaster Ranking</h1>
-            <p>Analyze disaster rankings based on selected metrics and time frames.</p>
+    const htmlContent = `
+        <div class="page-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--spacing-lg); padding-bottom: 8px; border-bottom: 1px solid #ddd;">
+            <h1 style="color: var(--color-primary);"><i class="fas fa-trophy" style="margin-right: 10px;"></i>Global Disaster Ranking</h1>
+            <div class="btn btn-primary" style="background: none; color: var(--color-primary); font-size: 1.1rem; font-weight: bold; padding: 0;">
+                <i class="fas fa-user-circle"></i> Login
+            </div>
         </div>
 
-        <!-- 1. 분석 설정 (필터링 영역) -->
-        <div class="card analysis-settings-card" style="margin-top: var(--spacing-lg);">
-            <h2 style="color: var(--color-text-dark); border-bottom: 1px solid #eee; padding-bottom: var(--spacing-sm);">Analysis Settings</h2>
+        <div class="analysis-settings-card card" style="margin-bottom: var(--spacing-lg);">
+            <h2 style="margin-bottom: var(--spacing-md); color: var(--color-primary);">Analysis Settings</h2>
             
-            <form id="ranking-filter-form" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: var(--spacing-md); margin-top: var(--spacing-md);">
+            <form id="ranking-filter-form" style="
+                display: grid; 
+                grid-template-columns: 200px 1fr; 
+                gap: var(--spacing-sm) var(--spacing-lg); 
+                margin-top: var(--spacing-md);
+                align-items: center; 
+            ">
                 
-                <!-- 1. 순위 기준 지표 (rank_by) -->
-                <div>
-                    <label for="rank-by" class="form-label">Rank By (Metric)</label>
-                    <select id="rank-by" name="rank_by">
-                        <option value="total_deaths">Total Deaths</option>
-                        <option value="total_affected">Total Affected</option>
-                        <option value="total_damage_thousand_usd">Total Damage (USD)</option>
-                    </select>
-                </div>
+                <label for="rank-by" class="form-label">Rank By (Metric)</label>
+                <select id="rank-by" name="rank_by" style="padding: 5px; width: 250px;">
+                    <option value="total_deaths" selected>Total Deaths</option>
+                    <option value="total_affected">Total Affected</option>
+                    <option value="total_damage_thousand_usd">Total Damage (USD)</option>
+                </select>
 
-                <!-- 2. 시작 연도 (start_year) -->
-                <div>
-                    <label for="start-year" class="form-label">Start Year</label>
-                    <input type="number" id="start-year" name="start_year" value="2010" min="1900" max="2024">
-                </div>
+                <label for="start-year" class="form-label">Start Year</label>
+                <input type="number" id="start-year" name="start_year" value="2010" min="1900" max="2025" style="padding: 5px; width: 100px;">
 
-                <!-- 3. 종료 연도 (end_year) -->
-                <div>
-                    <label for="end-year" class="form-label">End Year</label>
-                    <input type="number" id="end-year" name="end_year" value="2022" min="1900" max="2024">
-                </div>
+                <label for="end-year" class="form-label">End Year</label>
+                <input type="number" id="end-year" name="end_year" value="2022" min="1900" max="2025" style="padding: 5px; width: 100px;">
                 
-                <!-- 4. 대륙 필터링 (continent_id) -->
-                <div>
-                    <label for="continent-id" class="form-label">Continent</label>
-                    <select id="continent-id" name="continent_id">
-                        <option value="">All Continents</option>
-                        <option value="2">Asia (Mock)</option>
-                        <!-- 실제 데이터베이스에서 대륙 목록을 가져와야 함 -->
-                    </select>
-                </div>
+                 <label for="continent-id" class="form-label">Continent Filter</label>
+                <select id="continent-id" name="continent_id" style="padding: 5px; width: 200px;">
+                    <option value="" selected>All Continent</option>
+                    <option value="2">Asia (Mock)</option>
+                </select>
 
-                <!-- 5. 재해 유형 필터링 (disaster_type_id) -->
-                <div>
-                    <label for="disaster-type-id" class="form-label">Disaster Type</label>
-                    <select id="disaster-type-id" name="disaster_type_id">
-                        <option value="">All Disaster Types</option>
-                        <option value="5">Flood (Mock)</option>
-                        <!-- 실제 데이터베이스에서 재해 유형 목록을 가져와야 함 -->
-                    </select>
-                </div>
+                 <label for="disaster-type-id" class="form-label">Disaster Filter</label>
+                <select id="disaster-type-id" name="disaster_type_id" style="padding: 5px; width: 200px;">
+                    <option value="" selected>All Type</option>
+                    <option value="5">Flood (Mock)</option>
+                </select>
                 
-                <!-- Submit Button -->
-                <div style="align-self: end;">
-                    <button type="submit" class="btn btn-primary" style="width: 100%;">
-                        <i class="fas fa-chart-bar"></i> Analyze Ranking
-                    </button>
+                <div style="grid-column: 1 / -1; margin-top: var(--spacing-lg);">
+                    <button type="submit" class="btn btn-nav" style="width: 100px; padding: 10px 15px; text-align: center;">Run</button>
                 </div>
             </form>
         </div>
 
-        <!-- 2. 결과 및 시각화 영역 -->
-        <div class="card visualization-area" style="margin-top: var(--spacing-lg);">
-            <h2 style="color: var(--color-primary);">Results & Visualization</h2>
-            
-            <!-- 그래프가 렌더링될 Canvas -->
-            <div id="ranking-chart-container" style="height: 400px; margin-top: var(--spacing-md); background-color: var(--color-background); border-radius: var(--border-radius);">
-                <canvas id="ranking-chart"></canvas>
-            </div>
-            
-            <!-- 순위 테이블 -->
-            <h3 style="margin-top: var(--spacing-lg);">Top 10 Disasters by Total Deaths (2010-2022)</h3>
+        <div class="ranking-results-card card">
+            <h2 style="margin-bottom: var(--spacing-md); color: var(--color-primary);">Results & Visualization</h2>
+            <h3 id="ranking-results-title" style="margin-bottom: var(--spacing-lg); color: #495057;">Analysis Results</h3>
+
             <div id="ranking-table-container" style="overflow-x: auto; margin-top: var(--spacing-md);">
-                <!-- 순위 데이터 테이블이 JS에 의해 여기에 생성됩니다 -->
-                <p>Loading ranking data...</p>
+                <p style="text-align: center; color: #6C757D; padding: 30px;">순위 분석을 위해 상단 필터를 설정하고 'Run' 버튼을 눌러주세요.</p>
             </div>
         </div>
     `;
+
+    // 이벤트 리스너와 필터 데이터 로딩을 동시에 실행
+    setTimeout(() => {
+        setupEventListeners();
+        populateFilters();
+    }, 0);
+
+    return htmlContent;
 }

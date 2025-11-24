@@ -2,32 +2,29 @@
 /* 1. 색상 팔레트 */
 /* ==================================== */
 :root {
-    /* Primary Colors */
-    --color-primary: #004D40;     /* 딥 그린 */
-    --color-accent: #8BC34A;      /* 강조/버튼 색상 */
+    --color-primary: #004D40;     
+    --color-accent: #8BC34A;     
     
-    /* Background & Surface Colors */
-    --color-background: #F6F4F4;  /* 기본 배경색 */
-    --color-surface: #FFFFFF;     /* 카드/박스 내부 배경색 */
+    --color-background: #F6F4F4;
+    --color-surface: #FFFFFF;
     
-    /* Text Colors */
-    --color-text-dark: #2C2C2C;   /* 블랙 (기본 텍스트) */
-    --color-text-light: #F8F9FA;  /* 화이트 (반전 텍스트) */
+    --color-text-dark: #2C2C2C;
+    --color-text-light: #F8F9FA;
     
-    /* Layout & Utility */
+    --sidebar-width: 250px;
+    --sidebar-collapsed-width: 60px;
     --spacing-xs: 4px;
     --spacing-sm: 8px;
     --spacing-md: 16px;
     --spacing-lg: 24px;
     --border-radius: 6px;
-    --box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    --box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
 /* ==================================== */
 /* 2. 기본 리셋 및 타이포그래피 */
 /* ==================================== */
 
-/* HTML 폰트 크기 및 박스 모델 설정 */
 *, *::before, *::after {
     box-sizing: border-box;
     margin: 0;
@@ -35,48 +32,56 @@
 }
 
 body {
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
     line-height: 1.6;
     color: var(--color-text-dark);
     background-color: var(--color-background);
-    min-height: 100vh; /* 전체 높이 확보 */
+    min-height: 100vh;
+    position: relative;
+    overflow-x: hidden;
 }
 
+
 /* ==================================== */
-/* 3. 공통 UI 스타일 - 버튼 수정 */
+/* 3. 공통 UI 스타일 - 버튼 및 카드 */
 /* ==================================== */
 
-/* 기본 버튼 스타일은 유지 */
+/* 기본 버튼 스타일 */
 .btn {
     padding: var(--spacing-sm) var(--spacing-md);
     border: none;
     border-radius: var(--border-radius);
     cursor: pointer;
     font-weight: bold;
-    transition: background-color 0.2s, color 0.2s;
+    transition: background-color 0.2s, box-shadow 0.2s;
 }
 
-/* 1. Primary Button: 딥 그린 배경 (로그인, 주요 액션) */
+/* 1. Primary Button: 딥 그린 배경 */
 .btn-primary {
-    background-color: var(--color-primary); /* #004D40 */
-    color: var(--color-text-light);         /* #F8F9FA */
+    background-color: var(--color-primary);
+    color: var(--color-text-light);
 }
 
 .btn-primary:hover {
-    background-color: #00332B; /* 딥 그린보다 약간 어둡게 */
+    background-color: #00332B; 
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
 }
 
 
 /* 2. Navigation Button: 밝은 그린 배경 */
 .btn-nav {
-    background-color: var(--color-accent);  /* #8BC34A */
-    color: var(--color-text-light);         /* #F8F9FA */
+    background-color: var(--color-accent);
+    color: var(--color-text-dark);
     width: 100%; 
-    text-align: left; /* 텍스트는 왼쪽 정렬 */
+    text-align: center;
+    font-size: 1.1rem;
+    padding: var(--spacing-md);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .btn-nav:hover {
-    background-color: #79A841; /* 밝은 그린보다 약간 어둡게 */
+    background-color: #79A841; 
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
 }
 
 /* 카드/박스 (대시보드 내부 요소) */
@@ -85,22 +90,18 @@ body {
     border-radius: var(--border-radius);
     box-shadow: var(--box-shadow);
     padding: var(--spacing-lg);
+    transition: transform 0.2s;
 }
 
-/* 입력 필드 */
-input[type="text"], input[type="password"], input[type="number"], select {
-    padding: var(--spacing-sm);
-    border: 1px solid #ddd;
-    border-radius: var(--border-radius);
-    width: 100%;
-    margin-bottom: var(--spacing-md);
+.card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
 }
 
 /* ==================================== */
 /* 4. Data Manage 테이블 액션 버튼 (CRUD) */
 /* ==================================== */
 
-/* 공통 액션 버튼 스타일 */
 .btn-action {
     padding: 4px 8px;
     font-size: 0.85rem;
@@ -108,58 +109,9 @@ input[type="text"], input[type="password"], input[type="number"], select {
     color: var(--color-text-light); 
 }
 
-/* Show 버튼 (정보 확인) */
-.btn-show {
-    background-color: #17A2B8; 
-}
-
-.btn-show:hover {
-    background-color: #138496;
-}
-
-/* Edit 버튼 (수정) */
-.btn-edit {
-    background-color: #6C757D;
-}
-
-.btn-edit:hover {
-    background-color: #5A6268;
-}
-
-/* Delete 버튼 (삭제) */
-.btn-delete {
-    background-color: #DC3545; 
-}
-
-.btn-delete:hover {
-    background-color: #C82333;
-}
-
-body {
-    /* body는 Flex 컨테이너 대신, 기본 레이아웃 컨테이너 역할 */
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
-    line-height: 1.6;
-    color: var(--color-text-dark);
-    background-color: var(--color-background);
-    /* height 100% 설정 */
-    min-height: 100vh; 
-    display: flex; /* 사이드바와 메인 콘텐츠를 가로로 배치 */
-    position: relative; /* 토글 버튼 절대 위치를 위한 기준점 */
-}
-
-/* ==================================== */
-/* 5. 메인 콘텐츠 영역 (수정) */
-/* ==================================== */
-.main-content {
-    flex-grow: 1; /* 남은 공간을 모두 차지 */
-    padding: var(--spacing-lg);
-    overflow-y: auto;
-    /* 사이드바 접힘 상태에 따라 왼쪽 마진을 조정할 예정 */
-    margin-left: 250px; /* 초기 사이드바 너비만큼 공간 확보 */
-    transition: margin-left 0.3s ease; /* 애니메이션 효과 */
-}
-
-/* 사이드바가 닫혔을 때 메인 콘텐츠를 왼쪽 끝까지 당김 */
-body.sidebar-closed .main-content {
-    margin-left: 0;
-}
+.btn-show { background-color: #17A2B8; }
+.btn-show:hover { background-color: #138496; }
+.btn-edit { background-color: #6C757D; }
+.btn-edit:hover { background-color: #5A6268; }
+.btn-delete { background-color: #DC3545; }
+.btn-delete:hover { background-color: #C82333; }
