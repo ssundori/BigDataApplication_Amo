@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BigData Application - Dashboard</title>
+    <title>BigData Application - Ranking</title>
     
     <link rel="stylesheet" href="./fe/css/style.css">
     <link rel="stylesheet" href="./fe/css/sidebar.css">
