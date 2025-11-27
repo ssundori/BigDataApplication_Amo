@@ -1,4 +1,4 @@
-USE team18
+USE team18;
 -- =============================
 -- INSERT Script for All Tables
 -- =============================
