@@ -2,10 +2,10 @@
 mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT);
 
 $host = "127.0.0.1";
-$port = 3306;   
-$user = "root";
-$pass = "";     
-$dbname = "climate_disaster_db";
+$port = 3306;   #실행 시 포트 번호 변경
+$user = "root"; #실행시 team18 로 변경
+$pass = "";     #실행 시 team18로 변경
+$dbname = "team18";
 
 try {
     $mysqli = new mysqli($host, $user, $pass, $dbname, $port);
@@ -15,5 +15,6 @@ try {
     echo "DB ERROR: " . $e->getMessage();
 }
 ?>
+
 
 
