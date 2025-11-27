@@ -31,7 +31,7 @@ export function renderSidebar() {
         </div>
 
         <div class="sidebar-login-section">
-            <a href="/team18/api/auth/login.php" class="sidebar-login-link">
+            <a href="/team18/login.php" class="sidebar-login-link">
                 <i class="fas fa-sign-in-alt"></i> Login/Sign In 
                 <span id="user-info-display" style="margin-left: 8px;"></span>
             </a>
