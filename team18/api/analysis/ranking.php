@@ -7,6 +7,13 @@ require_once __DIR__ . "/../config/db.php";
 
 header("Content-Type: application/json; charset=utf-8");
 
+// 입력값 정규화
+function normalize($v) {
+    if (!isset($v)) return null;
+    if ($v === "" || $v === "undefined" || $v === "null") return null;
+    return $v;
+}
+
 // 필수 파라미터
 $rank_by = $_GET['rank_by'] ?? null;
 $start_year = $_GET['start_year'] ?? null;
@@ -57,17 +64,17 @@ $sql = "
 $types = "ii";
 $params = [$start_year, $end_year];
 
-if ($continent_id) {
+if ($continent_id !== null) {
     $sql .= " AND c.continent_id = ? ";
     $types .= "i";
-    $params[] = $continent_id;
+    $params[] = intval($continent_id);
 }
 
 // 재해 유형 필터
-if ($disaster_type_id) {
+if ($disaster_type_id !== null) {
     $sql .= " AND d.disaster_type_id = ? ";
     $types .= "i";
-    $params[] = $disaster_type_id;
+    $params[] = intval($disaster_type_id);
 }
 
 // 그룹/정렬/Top 10
