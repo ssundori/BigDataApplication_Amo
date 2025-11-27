@@ -38,27 +38,37 @@ switch ($data_series) {
         break;
 
     case "sst_anomaly":
-        if (!$region_entity) {
-            echo json_encode([
-                "success" => false,
-                "message" => "region_entity is required for sst_anomaly."
-            ]);
-            exit;
-        }
 
+    // region_entity가 빈 문자열 또는 null이면 "전체 지역" 조회
+    if ($region_entity === "" || $region_entity === null) {
         $sql = "
             SELECT measurement_year AS year, sst_anomaly_celsius AS value
             FROM global_annual_sst_anomalies
             WHERE measurement_year BETWEEN ? AND ?
-              AND region_entity = ?
             ORDER BY measurement_year ASC
         ";
-        $types = "iis";
-        $params = [$start_year, $end_year, $region_entity];
+        $types = "ii";
+        $params = [$start_year, $end_year];
         $unit = "°C";
-        $description = "${window_size}-year moving average of sea surface temperature anomalies";
+        $description = "${window_size}-year moving average of sea surface temperature anomalies (all regions)";
         break;
+    }
 
+    // 특정 region_entity만 조회
+    $sql = "
+        SELECT measurement_year AS year, sst_anomaly_celsius AS value
+        FROM global_annual_sst_anomalies
+        WHERE measurement_year BETWEEN ? AND ?
+          AND region_entity = ?
+        ORDER BY measurement_year ASC
+    ";
+    $types = "iis";
+    $params = [$start_year, $end_year, $region_entity];
+    $unit = "°C";
+    $description = "${window_size}-year moving average of sea surface temperature anomalies for region {$region_entity}";
+    break;
+
+    
     case "co2_concentration":
         $sql = "
             SELECT year AS year, co2_ppm AS value
