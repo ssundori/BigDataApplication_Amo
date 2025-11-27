@@ -11,49 +11,59 @@ function renderRankingResults(data, rankByLabel, title) {
 
     titleElement.textContent = title;
     
-    if (!data || data.length === 0) {
-        container.innerHTML = `<p style="text-align: center; color: #6C757D; padding: 30px;">조회된 랭킹 데이터가 없습니다.</p>`;
-        return;
-    }
-    
-    const tableHtml = `
-        <table style="width: 100%; border-collapse: collapse; margin-top: 20px; font-size: 0.95rem;">
-            <thead>
-                <tr style="background-color: #e9ecef;">
-                    <th style="padding: 10px; border: 1px solid #ddd; text-align: left; width: 50px;">Rank</th>
-                    <th style="padding: 10px; border: 1px solid #ddd; text-align: left;">Country</th>
-                    <th style="padding: 10px; border: 1px solid #ddd; text-align: left;">Disaster Type</th>
-                    <th style="padding: 10px; border: 1px solid #ddd; text-align: right;">Value (${rankByLabel})</th>
-                </tr>
-            </thead>
-            <tbody>
-                ${data.map(item => `
-                    <tr>
-                        <td style="padding: 10px; border: 1px solid #ddd;">${item.rank}</td>
-                        <td style="padding: 10px; border: 1px solid #ddd;">${item.country_name}</td>
-                        <td style="padding: 10px; border: 1px solid #ddd;">${item.disaster_type}</td>
-                        <td style="padding: 10px; border: 1px solid #ddd; text-align: right;">${item.measure_value.toLocaleString()}</td>
+    try {
+        const tableHtml = `
+            <table style="width: 100%; border-collapse: collapse; margin-top: 20px; font-size: 0.95rem;">
+                <thead>
+                    <tr style="background-color: #e9ecef;">
+                        <th style="padding: 10px; border: 1px solid #ddd; text-align: left; width: 50px;">Rank</th>
+                        <th style="padding: 10px; border: 1px solid #ddd; text-align: left;">Country</th>
+                        <th style="padding: 10px; border: 1px solid #ddd; text-align: left;">Disaster Type</th>
+                        <th style="padding: 10px; border: 1px solid #ddd; text-align: right;">Value (${rankByLabel})</th>
                     </tr>
-                `).join('')}
-            </tbody>
-        </table>
-    `;
-    container.innerHTML = tableHtml;
+                </thead>
+                <tbody>
+                    ${data.map(item => {
+                        const value = item.measure_value ? Number(item.measure_value) : 0;
+                        return `
+                        <tr>
+                            <td style="padding: 10px; border: 1px solid #ddd;">${item.rank}</td>
+                            <td style="padding: 10px; border: 1px solid #ddd;">${item.country_name || '-'}</td>
+                            <td style="padding: 10px; border: 1px solid #ddd;">${item.disaster_type || '-'}</td>
+                            <td style="padding: 10px; border: 1px solid #ddd; text-align: right;">${value.toLocaleString()}</td>
+                        </tr>
+                        `;
+                    }).join('')}
+                </tbody>
+            </table>
+        `;
+        container.innerHTML = tableHtml;
+    } catch (e) {
+        console.error("Rendering Error:", e);
+        container.innerHTML = `<p style="color: red; text-align: center;">데이터 렌더링 중 오류가 발생했습니다.<br>(${e.message})</p>`;
+    }
 }
 
 async function fetchRankingData(params, rankByLabel) {
     const container = document.getElementById('ranking-table-container');
     container.innerHTML = '<p style="text-align: center; color: var(--color-primary); padding: 30px;"><i class="fas fa-spinner fa-spin"></i> 데이터를 불러오는 중...</p>';
     
-    // api.js의 mock 데이터 또는 실제 백엔드 호출
-    const result = await fetchData('analysis/ranking.php', params);
+    try {
+        const result = await fetchData('analysis/ranking.php', params);
 
-    if (result.success) { // status 대신 success 체크
-        const title = `Top ${result.meta.total_records} Disasters by ${rankByLabel} (${result.meta.range})`;
-        renderRankingResults(result.data, rankByLabel, title);
-    } else {
-        container.innerHTML = `<p style="text-align: center; color: #DC3545; padding: 30px;">오류: ${result.error?.message || '데이터 조회 실패'}</p>`;
-        document.getElementById('ranking-results-title').textContent = '데이터 조회 실패';
+        if (result.success) { 
+            const rangeText = `${params.start_year} ~ ${params.end_year}`;
+            const title = `Top ${result.meta.total_records} Disasters by ${rankByLabel} (${rangeText})`;
+            
+            renderRankingResults(result.data, rankByLabel, title);
+        } else {
+            container.innerHTML = `<p style="text-align: center; color: #DC3545; padding: 30px;">오류: ${result.error?.message || '데이터 조회 실패'}</p>`;
+            const titleEl = document.getElementById('ranking-results-title');
+            if(titleEl) titleEl.textContent = '데이터 조회 실패';
+        }
+    } catch (error) {
+        console.error("Fetch Error:", error);
+        container.innerHTML = `<p style="text-align: center; color: #DC3545; padding: 30px;">치명적 오류 발생: ${error.message}</p>`;
     }
 }
 
@@ -107,7 +117,8 @@ export async function populateFilters() {
         if (typeData && typeData.success) {
             let html = '<option value="">All Type</option>';
             typeData.data.forEach(d => {
-                html += `<option value="${d.id}">${d.type} (${d.group})</option>`;
+                const typeName = d.subtype || d.type || "Unknown";
+                html += `<option value="${d.id}">${typeName} (${d.group})</option>`;
             });
             if(disasterSelect) disasterSelect.innerHTML = html;
         }
