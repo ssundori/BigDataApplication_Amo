@@ -44,7 +44,7 @@ export function render() {
     
     const loginButtonHtml = isAuthenticated 
         ? `<span style="font-weight: bold; color: var(--color-primary);">${userName}</span>`
-        : `<button class="btn btn-primary" onclick="window.location.href='/team18/api/auth/login.php'">
+        : `<button class="btn btn-primary" onclick="window.location.href='/team18/login.php'">
             <i class="fas fa-sign-in-alt"></i> Login/Sign Up
         </button>`;
 
