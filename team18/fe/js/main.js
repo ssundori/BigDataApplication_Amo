@@ -3,6 +3,9 @@
 import { render as renderHomePage, loadData as loadHomeData } from './pages/HomePage.js'; // loadData import 추가
 import { render as renderRankingPage } from './pages/RankingPage.js';
 import { render as renderWindowingPage } from './pages/WindowingPage.js';
+import { render as renderAggregationPage } from './pages/AggregationPage.js';
+import { render as renderRollupPage } from './pages/RollupPage.js';
+import { render as renderDataManagePage } from './pages/DataManagePage.js';
 import { renderSidebar, setupSidebarToggle } from '../components/Sidebar.js';
 
 function renderPageShell() {
@@ -30,6 +33,13 @@ async function route() {
         pageType = 'ranking'; // RankingPage 내부에서 populateFilters를 호출하므로 별도 처리 없어도 됨
     } else if (path.includes('windowing.php')) {
         content = renderWindowingPage();
+    } else if (path.includes('aggregation')) {   // aggregation.php, aggregation.html 다 잡음
+        content = renderAggregationPage();
+    } else if (path.includes('rollup')) {
+        content = renderRollupPage();
+    } else if (path.includes('datamanage')) {      // datamanage.php
+        content = renderDataManagePage();
+    // 그 외 → 404
     } else {
         content = `<h1>404 Not Found</h1>`;
     }
