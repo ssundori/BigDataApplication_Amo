@@ -21,7 +21,7 @@ try {
         SELECT 
             disaster_type_id,
             disaster_group,
-            disaster_type
+            disaster_subtype
         FROM disaster_types
         ORDER BY disaster_type_id ASC
     ";
@@ -34,7 +34,7 @@ try {
         $data[] = [
             "id"    => (int)$row["disaster_type_id"],
             "group" => $row["disaster_group"],
-            "type"  => $row["disaster_type"]
+            "type"  => $row["disaster_subtype"]
         ];
     }
 
@@ -52,3 +52,4 @@ try {
         "message" => $e->getMessage()
     ]);
 }
+
