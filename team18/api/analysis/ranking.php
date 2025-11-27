@@ -20,8 +20,8 @@ $start_year = $_GET['start_year'] ?? null;
 $end_year = $_GET['end_year'] ?? null;
 
 // 선택 파라미터
-$continent_id = $_GET['continent_id'] ?? null;
-$disaster_type_id = $_GET['disaster_type_id'] ?? null;
+$continent_id = normalize($_GET['continent_id'] ?? null);
+$disaster_type_id = normalize($_GET['disaster_type_id'] ?? null);
 
 // 필수값 체크
 if (!$rank_by || !$start_year || !$end_year) {
