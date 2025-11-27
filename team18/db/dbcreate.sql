@@ -1,10 +1,10 @@
 -- 데이터베이스 생성
-DROP DATABASE IF EXISTS climate_disaster_db;
-CREATE DATABASE IF NOT EXISTS climate_disaster_db
+DROP DATABASE IF EXISTS team18;
+CREATE DATABASE IF NOT EXISTS team18
   CHARACTER SET utf8mb4
   COLLATE utf8mb4_general_ci;
 
-USE climate_disaster_db;
+USE team18;
 
 -- Continent (대륙)
 CREATE TABLE continent (
