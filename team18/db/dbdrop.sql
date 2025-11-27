@@ -1,7 +1,9 @@
+USE team18;
+
 SET FOREIGN_KEY_CHECKS = 0;
 
 DROP TABLE user_insert;
-DROP TABLE country_monthly_temperatures;
+DROP TABLE country_annual_temperatures;
 DROP TABLE disasters;
 
 DROP TABLE country;
