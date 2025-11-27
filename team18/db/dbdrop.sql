@@ -1,3 +1,5 @@
+USE team18;
+
 SET FOREIGN_KEY_CHECKS = 0;
 
 DROP TABLE user_insert;
