@@ -247,8 +247,8 @@ export function render() {
                 <i class="fas fa-database" style="margin-right:10px;"></i>
                 Data Manage Page
             </h1>
-            <div class="btn btn-primary" style="background:none; color:var(--color-primary); font-size:1.1rem; font-weight:bold; padding:0;">
-                <i class="fas fa-user-circle"></i> Login
+            <!-- ✅ 공통 로그인/닉네임/로그아웃 영역 -->
+            <div class="js-auth-area"></div>
             </div>
         </div>
 
@@ -322,3 +322,4 @@ export function render() {
 export async function loadData() {
     return;
 }
+
