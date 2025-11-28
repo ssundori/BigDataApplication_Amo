@@ -3,9 +3,9 @@ mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT);
 
 $host = "127.0.0.1";
 $port = 3306;
-$user = "root";
-$pass = "";
-$dbname = "climate_disaster_db";
+$user = "team18";
+$pass = "team18";
+$dbname = "team18";
 
 try {
     $mysqli = new mysqli($host, $user, $pass, $dbname, $port);
@@ -19,3 +19,4 @@ try {
     ]);
     exit;
 }
+
