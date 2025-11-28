@@ -132,8 +132,8 @@ export function render() {
     const htmlContent = `
         <div class="page-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--spacing-lg); padding-bottom: 8px; border-bottom: 1px solid #ddd;">
             <h1 style="color: var(--color-primary);"><i class="fas fa-trophy" style="margin-right: 10px;"></i>Global Disaster Ranking</h1>
-            <div class="btn btn-primary" style="background: none; color: var(--color-primary); font-size: 1.1rem; font-weight: bold; padding: 0;">
-                <i class="fas fa-user-circle"></i> Login
+            <!-- ✅ 공통 로그인/닉네임/로그아웃 영역 -->
+            <div class="js-auth-area"></div>
             </div>
         </div>
 
