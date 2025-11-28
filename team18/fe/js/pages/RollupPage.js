@@ -236,8 +236,8 @@ export function render() {
                 <i class="fas fa-temperature-high" style="margin-right:10px;"></i>
                 Global Temperature Roll-up
             </h1>
-            <div class="btn btn-primary" style="background:none; color:var(--color-primary); font-size:1.1rem;">
-                <i class="fas fa-user-circle"></i> Login
+            <!-- ✅ 공통 로그인/닉네임/로그아웃 영역 -->
+            <div class="js-auth-area"></div>
             </div>
         </div>
 
@@ -301,3 +301,4 @@ export function render() {
 }
 
 export async function loadData() { return; }
+
