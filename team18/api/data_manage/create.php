@@ -1,7 +1,8 @@
 <?php
 // team18/api/data_manage/create.php
 
-ini_set("display_errors", 1);
+ob_start();  // ★ PHP warning을 숨겨 JSON 깨짐 방지
+ini_set("display_errors", 0);
 error_reporting(E_ALL);
 
 header("Content-Type: application/json; charset=utf-8");
@@ -91,7 +92,6 @@ try {
     $stmt2->bind_param("ii", $user_id, $new_id);
     $stmt2->execute();
 
-    // 커밋
     $mysqli->commit();
 
     echo json_encode([
@@ -110,8 +110,6 @@ try {
     ]);
 
 } catch (Exception $e) {
-
-    // 롤백
     $mysqli->rollback();
 
     echo json_encode([
