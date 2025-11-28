@@ -97,10 +97,17 @@ try {
     $res = $stmt->get_result();
     $row = $res->fetch_assoc();
 
+    if (!$row) {
+    $overall = [
+        "sum" => null,
+        "avg" => null
+    ];
+} else {
     $overall = [
         "sum" => $row["sum_value"] !== null ? $row["sum_value"] + 0 : null,
         "avg" => $row["avg_value"] !== null ? $row["avg_value"] + 0 : null
     ];
+}
 
     echo json_encode([
         "success"        => true,
@@ -120,3 +127,4 @@ try {
         "message" => $e->getMessage()
     ]);
 }
+

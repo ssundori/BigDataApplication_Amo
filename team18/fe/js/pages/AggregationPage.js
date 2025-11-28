@@ -25,8 +25,19 @@ function renderAggregationResults(result, measureLabel, yearRangeLabel) {
 
     titleEl.textContent = `Aggregated Results (${yearRangeLabel}) - ${measureLabel}`;
 
-    const sumVal = (overall.sum ?? 0).toLocaleString();
-    const avgVal = (overall.avg ?? 0).toLocaleString();
+    // 🔹 전체 합/평균이 전부 null이면: 제목만 보여주고 내용은 비워둠
+    if (overall.sum === null && overall.avg === null) {
+        container.innerHTML = `
+            <p style="text-align: center; color: #6C757D; padding: 24px;">
+                선택한 조건에 해당하는 데이터가 없습니다.
+            </p>
+        `;
+        return;
+    }
+
+    // 여기부터는 실제 데이터 있을 때만 실행
+    const sumVal = overall.sum.toLocaleString();
+    const avgVal = overall.avg.toLocaleString();
 
     let html = `
         <div style="
@@ -45,36 +56,6 @@ function renderAggregationResults(result, measureLabel, yearRangeLabel) {
             </div>
         </div>
     `;
-
-    if (byYear.length > 0) {
-        html += `
-            <h4 style="margin: 8px 0 4px; color: #495057;">Yearly Trend</h4>
-            <table style="width: 100%; border-collapse: collapse; margin-top: 8px; font-size: 0.9rem;">
-                <thead>
-                    <tr style="background-color: #e9ecef;">
-                        <th style="padding: 8px; border: 1px solid #dee2e6; text-align: left;">Year</th>
-                        <th style="padding: 8px; border: 1px solid #dee2e6; text-align: right;">Sum</th>
-                        <th style="padding: 8px; border: 1px solid #dee2e6; text-align: right;">Average</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    ${byYear.map(row => `
-                        <tr>
-                            <td style="padding: 8px; border: 1px solid #dee2e6;">${row.year}</td>
-                            <td style="padding: 8px; border: 1px solid #dee2e6; text-align: right;">${(row.sum ?? 0).toLocaleString()}</td>
-                            <td style="padding: 8px; border: 1px solid #dee2e6; text-align: right;">${(row.avg ?? 0).toLocaleString()}</td>
-                        </tr>
-                    `).join('')}
-                </tbody>
-            </table>
-        `;
-    } else {
-        html += `
-            <p style="text-align: center; color: #6C757D; padding: 24px;">
-                연도별 상세 데이터가 없습니다.
-            </p>
-        `;
-    }
 
     container.innerHTML = html;
 }
@@ -265,3 +246,4 @@ export function render() {
 
     return htmlContent;
 }
+
