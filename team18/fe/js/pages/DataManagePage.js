@@ -3,10 +3,10 @@ import { fetchData } from '../../utils/api.js';
 
 const STATE = {
     allRows: [],          // 전체 disasters 데이터
-    filteredRows: [],     // 검색/필터 적용된 데이터
+    filteredRows: [],     // 화면에 쓸 데이터
     currentPage: 1,
     pageSize: 10,
-    searchKeyword: '',
+    searchKeyword: '',    // 지금은 사용하지 않음 (검색 제거)
     countries: {},        // country_id -> country_name
     disasterTypes: {},    // disaster_type_id -> label
     currentUser: null
@@ -40,7 +40,6 @@ async function loadDisasterTypes() {
     if (!res?.success || !Array.isArray(res.data)) return;
     const map = {};
     res.data.forEach((t) => {
-        // label: "Group / Type / Subtype" 형태로 만들기
         const parts = [];
         if (t.group) parts.push(t.group);
         if (t.type) parts.push(t.type);
@@ -52,7 +51,6 @@ async function loadDisasterTypes() {
 
 /** disasters 목록 로딩 ---------------------------------------- */
 async function loadDisasters() {
-    // 한 번에 많이 가져오도록 page_size 크게
     const res = await fetchData('data_manage/read.php', {
         table: 'disasters',
         page: 1,
@@ -70,30 +68,9 @@ async function loadDisasters() {
     STATE.filteredRows = [...STATE.allRows];
 }
 
-/** 검색 + 페이지 적용 후 테이블 렌더 ------------------------- */
+/** (검색 없는 버전) 필터 적용 후 렌더 ------------------------ */
 function applyFilterAndRender() {
-    const keyword = STATE.searchKeyword.trim().toLowerCase();
-
-    let rows = [...STATE.allRows];
-    if (keyword) {
-        rows = rows.filter((row) => {
-            const idStr = String(row.disaster_id ?? '').toLowerCase();
-
-            const countryName =
-                STATE.countries[row.country_id] || '';
-
-            const typeLabel =
-                STATE.disasterTypes[row.disaster_type_id] || '';
-
-            return (
-                idStr.includes(keyword) ||
-                countryName.toLowerCase().includes(keyword) ||
-                typeLabel.toLowerCase().includes(keyword)
-            );
-        });
-    }
-
-    STATE.filteredRows = rows;
+    STATE.filteredRows = [...STATE.allRows];
     STATE.currentPage = 1;
     renderTable();
     renderPagination();
@@ -116,7 +93,6 @@ function renderTable() {
 
     const startIdx = (currentPage - 1) * pageSize;
     const endIdx = Math.min(startIdx + pageSize, filteredRows.length);
-
     const pageRows = filteredRows.slice(startIdx, endIdx);
 
     const total = filteredRows.length;
@@ -128,9 +104,8 @@ function renderTable() {
 
     let html = '';
 
-    pageRows.forEach((row, idx) => {
-        const displayNum = row.disaster_id; // Num 열에 표시할 값
-
+    pageRows.forEach((row) => {
+        const displayNum = row.disaster_id;
         const creatorName = row.creator_name || '-';
         const creatorLoginId = row.creator_login_id || null;
 
@@ -148,12 +123,10 @@ function renderTable() {
                     <button type="button" class="btn btn-sm btn-light dm-btn-show">
                         <i class="fas fa-eye"></i> Show
                     </button>
-                    <button type="button" class="btn btn-sm dm-btn-edit" ${canEdit ? '' : 'disabled'
-            }>
+                    <button type="button" class="btn btn-sm dm-btn-edit" ${canEdit ? '' : 'disabled'}>
                         <i class="fas fa-edit"></i> Edit
                     </button>
-                    <button type="button" class="btn btn-sm dm-btn-delete" ${canEdit ? '' : 'disabled'
-            }>
+                    <button type="button" class="btn btn-sm dm-btn-delete" ${canEdit ? '' : 'disabled'}>
                         <i class="fas fa-trash-alt"></i> Delete
                     </button>
                 </td>
@@ -163,7 +136,6 @@ function renderTable() {
 
     tbody.innerHTML = html;
 
-    // 이벤트 바인딩
     tbody.querySelectorAll('.dm-btn-show').forEach((btn) => {
         btn.addEventListener('click', onClickShow);
     });
@@ -188,50 +160,36 @@ function renderPagination() {
     const { pageSize, currentPage } = STATE;
 
     const totalPages = Math.ceil(total / pageSize) || 1;
-    const blockSize = 10; // 한 번에 보여줄 최대 페이지 버튼 수
+    const blockSize = 10;
 
     let html = '';
 
-    // 페이지가 1개면 아무 버튼도 안 보여줘도 됨
     if (totalPages <= 1) {
         pager.innerHTML = '';
         return;
     }
 
-    // 현재 블록 계산 (1~10, 11~20 ...)
     const blockIndex = Math.floor((currentPage - 1) / blockSize);
     const startPage = blockIndex * blockSize + 1;
     const endPage = Math.min(startPage + blockSize - 1, totalPages);
 
-    // « (첫 페이지)
     if (currentPage > 1) {
         html += `<button type="button" class="btn btn-sm dm-page-btn" data-page="1">&laquo;</button>`;
-    }
-
-    // < (이전 페이지)
-    if (currentPage > 1) {
         html += `<button type="button" class="btn btn-sm dm-page-btn" data-page="${currentPage - 1}">&lt;</button>`;
     }
 
-    // 중간 페이지들
     for (let p = startPage; p <= endPage; p++) {
         html += `
             <button type="button"
-                    class="btn btn-sm dm-page-btn ${p === currentPage ? 'dm-page-btn-active' : ''
-            }"
+                    class="btn btn-sm dm-page-btn ${p === currentPage ? 'dm-page-btn-active' : ''}"
                     data-page="${p}">
                 ${p}
             </button>
         `;
     }
 
-    // > (다음 페이지)
     if (currentPage < totalPages) {
         html += `<button type="button" class="btn btn-sm dm-page-btn" data-page="${currentPage + 1}">&gt;</button>`;
-    }
-
-    // » (마지막 페이지)
-    if (currentPage < totalPages) {
         html += `<button type="button" class="btn btn-sm dm-page-btn" data-page="${totalPages}">&raquo;</button>`;
     }
 
@@ -248,7 +206,6 @@ function renderPagination() {
         });
     });
 }
-
 
 /** Show / Edit / Delete 핸들러 ------------------------------- */
 function findRowByEventTarget(target) {
@@ -303,7 +260,6 @@ async function onClickDelete(e) {
         return;
     }
 
-    // 프론트 상태에서도 제거
     STATE.allRows = STATE.allRows.filter(
         (r) => r.disaster_id !== row.disaster_id
     );
@@ -318,27 +274,7 @@ async function onClickDelete(e) {
 
 /** 이벤트 세팅 ----------------------------------------------- */
 function setupEvents() {
-    const searchInput = document.getElementById('dm-search-input');
-    const searchBtn = document.getElementById('dm-search-btn');
     const pageSizeSelect = document.getElementById('dm-page-size');
-
-    if (searchInput) {
-        searchInput.addEventListener('keydown', (e) => {
-            if (e.key === 'Enter') {
-                e.preventDefault();
-                STATE.searchKeyword = searchInput.value;
-                applyFilterAndRender();
-            }
-        });
-    }
-
-    if (searchBtn) {
-        searchBtn.addEventListener('click', (e) => {
-            e.preventDefault();
-            STATE.searchKeyword = searchInput.value;
-            applyFilterAndRender();
-        });
-    }
 
     if (pageSizeSelect) {
         pageSizeSelect.value = String(STATE.pageSize);
@@ -366,10 +302,8 @@ function initDataManagePage() {
 
     (async () => {
         STATE.currentUser = loadCurrentUser();
-
         await Promise.all([loadCountries(), loadDisasterTypes(), loadDisasters()]);
-
-        applyFilterAndRender(); // 내부에서 renderTable + renderPagination 호출
+        applyFilterAndRender();
         setupEvents();
     })();
 }
@@ -389,29 +323,21 @@ export function render() {
         <div class="card" id="dm-page-root" style="max-width:980px;">
             <div class="dm-top-bar"
                  style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
-                <button id="dm-add-new-btn" class="btn btn-nav"
-                        style="min-width:180px; display:flex; align-items:center; justify-content:center; gap:8px;">
+                <button id="dm-add-new-btn"
+                        class="btn btn-nav dm-add-new-btn">
                     <i class="fas fa-plus-circle"></i>
                     ADD NEW
                 </button>
 
-                <div style="display:flex; align-items:center; gap:8px;">
-                    <input id="dm-search-input"
-                           type="text"
-                           placeholder="Search by ID / Country / Disaster type"
-                           style="width:260px; padding:6px 8px; border:1px solid #ccc; border-radius:4px;">
-                    <button id="dm-search-btn" class="btn btn-secondary btn-sm">Search</button>
-
-                    <label style="margin-left:16px; font-size:0.9rem;">
-                        Results
-                        <select id="dm-page-size" style="margin-left:4px; padding:4px 6px;">
-                            <option value="5">5</option>
-                            <option value="10">10</option>
-                            <option value="15">15</option>
-                            <option value="20">20</option>
-                        </select>
-                    </label>
-                </div>
+                <label style="font-size:0.9rem;">
+                    Results
+                    <select id="dm-page-size" style="margin-left:4px; padding:4px 6px;">
+                        <option value="5">5</option>
+                        <option value="10" selected>10</option>
+                        <option value="15">15</option>
+                        <option value="20">20</option>
+                    </select>
+                </label>
             </div>
 
             <table class="table" style="width:100%; table-layout:fixed;">
