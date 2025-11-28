@@ -6,7 +6,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BigData Application - Roll-up</title>
+    <title>BigData Application - Temperature Roll-up</title>
 
     <!-- 팀원이 쓰는 FE용 CSS -->
     <link rel="stylesheet" href="./fe/css/style.css">
@@ -15,6 +15,9 @@
     <!-- 아이콘 폰트 -->
     <link rel="stylesheet"
           href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+
+    <!-- Chart.js (Roll-up 그래프용) -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
     <!-- 사이드바 들어갈 자리 -->
