@@ -244,6 +244,35 @@ INSERT INTO `global_annual_temperatures` VALUES (1,1950,13.60),(2,1951,13.74),(3
 UNLOCK TABLES;
 
 --
+-- Table structure for table `user_activity_log`
+--
+
+DROP TABLE IF EXISTS `user_activity_log`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `user_activity_log` (
+  `insert_id` int(11) NOT NULL AUTO_INCREMENT,
+  `user_id` int(11) DEFAULT NULL,
+  `table_name` varchar(50) DEFAULT NULL,
+  `record_id` int(11) DEFAULT NULL,
+  `action_type` varchar(20) DEFAULT NULL,
+  `created_time` timestamp NOT NULL DEFAULT current_timestamp(),
+  PRIMARY KEY (`insert_id`),
+  KEY `user_id` (`user_id`),
+  CONSTRAINT `user_activity_log_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `user_info` (`user_id`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `user_activity_log`
+--
+
+LOCK TABLES `user_activity_log` WRITE;
+/*!40000 ALTER TABLE `user_activity_log` DISABLE KEYS */;
+/*!40000 ALTER TABLE `user_activity_log` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
 -- Table structure for table `user_info`
 --
 
@@ -269,34 +298,6 @@ LOCK TABLES `user_info` WRITE;
 /*!40000 ALTER TABLE `user_info` DISABLE KEYS */;
 /*!40000 ALTER TABLE `user_info` ENABLE KEYS */;
 UNLOCK TABLES;
-
---
--- Table structure for table `user_insert`
---
-
-DROP TABLE IF EXISTS `user_insert`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
-CREATE TABLE `user_insert` (
-  `insert_id` int(11) NOT NULL AUTO_INCREMENT,
-  `user_id` int(11) DEFAULT NULL,
-  `table_name` varchar(50) DEFAULT NULL,
-  `record_id` int(11) DEFAULT NULL,
-  `created_time` timestamp NOT NULL DEFAULT current_timestamp(),
-  PRIMARY KEY (`insert_id`),
-  KEY `user_id` (`user_id`),
-  CONSTRAINT `user_insert_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `user_info` (`user_id`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `user_insert`
---
-
-LOCK TABLES `user_insert` WRITE;
-/*!40000 ALTER TABLE `user_insert` DISABLE KEYS */;
-/*!40000 ALTER TABLE `user_insert` ENABLE KEYS */;
-UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 
 /*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
@@ -307,4 +308,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2025-11-27 15:18:11
+-- Dump completed on 2025-11-29 13:43:28

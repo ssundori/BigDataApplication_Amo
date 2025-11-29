@@ -21,7 +21,7 @@ try {
     $totalDisaster = (int)$row1["cnt"];
 
     // Total User Insert
-    $res2 = $mysqli->query("SELECT COUNT(*) AS cnt FROM user_insert");
+    $res2 = $mysqli->query("SELECT COUNT(*) AS cnt FROM user_activity_log");
     $row2 = $res2->fetch_assoc();
     $totalUserInsert = (int)$row2["cnt"];
 

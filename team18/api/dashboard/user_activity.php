@@ -26,8 +26,9 @@ try {
             ui.user_name,
             u.table_name,
             u.record_id,
+            u.action_type,
             u.created_time
-        FROM user_insert u
+        FROM user_activity_log u
         JOIN user_info ui ON u.user_id = ui.user_id
         ORDER BY u.created_time DESC
         LIMIT ?
@@ -44,6 +45,7 @@ try {
             "userName"    => $row["user_name"],
             "table"       => $row["table_name"],
             "recordId"    => (int)$row["record_id"],
+            "actionType"  => $row["action_type"],   // 
             "createdTime" => $row["created_time"]   // 프론트에서 "30분 전"으로 변환
         ];
     }

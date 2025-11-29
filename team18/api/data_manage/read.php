@@ -6,7 +6,7 @@ error_reporting(E_ALL);
 
 header("Content-Type: application/json; charset=utf-8");
 
-require_once __DIR__ . "/../config/auth_check.php";   // 로그인 체크
+require_once __DIR__ . "/../config/auth_check.php";    // 로그인 체크
 require_once __DIR__ . "/../config/db.php";           // DB 연결
 
 // 요청 파라미터 읽기
@@ -62,9 +62,10 @@ if ($table === "disasters") {
             ui.user_login_id AS creator_login_id,
             ui.user_name     AS creator_name
         FROM disasters d
-        LEFT JOIN user_insert u
+        LEFT JOIN user_activity_log u
             ON u.table_name = 'disasters'
            AND u.record_id  = d.disaster_id
+           AND u.action_type = 'Insert'
         LEFT JOIN user_info ui
             ON ui.user_id = u.user_id
         ORDER BY d.disaster_id $sort_order

@@ -14,7 +14,8 @@
 <div class="auth-page-wrapper">
 
   <!-- 상단 AMO 로고 -->
-  <div class="auth-logo">AMO</div>
+  <a href="index.php" class="auth-logo">AMO</a>
+
 
   <!-- 로그인 카드 -->
   <div class="auth-card">

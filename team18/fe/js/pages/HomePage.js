@@ -122,7 +122,7 @@ function renderSummaryCards(totals) {
 
     container.innerHTML = `
         ${makeCard('Total Disaster', fmt(totals.disaster), 'fas fa-bolt', '#DC3545')}
-        ${makeCard('Total User Insert', fmt(totals.userInsert), 'fas fa-user-plus', '#FFC107')}
+        ${makeCard('Total User Work', fmt(totals.userInsert), 'fas fa-user-plus', '#FFC107')}
         ${makeCard('Total User', fmt(totals.user), 'fas fa-users', '#17A2B8')}
     `;
 }
@@ -146,6 +146,19 @@ function makeCard(title, value, icon, color) {
     `;
 }
 
+function actionLabel(actionType) {
+    switch (actionType) {
+        case 'Insert':
+            return '레코드를 추가했습니다';
+        case 'Update':
+            return '삽입한 레코드를 수정했습니다';
+        case 'Delete':
+            return '삽입한 레코드를 삭제했습니다';
+        default:
+            return '작업을 수행했습니다';
+    }
+}
+
 function renderActivityList(activities) {
     const container = document.getElementById('activity-list');
     if (!container) return;
@@ -161,7 +174,7 @@ function renderActivityList(activities) {
                 (item) => `
         <p style="margin-bottom:8px;">
             <i class="fas fa-history" style="margin-right:5px;"></i>
-            <strong>${item.userName}</strong>님이 [${item.table}]에 레코드를 추가했습니다.
+            <strong>${item.userName}</strong>님이 [${item.table}]테이블에 ${actionLabel(item.actionType)}.
             <span style="font-size:0.8em; color:#aaa;">(${item.createdTime})</span>
         </p>
     `

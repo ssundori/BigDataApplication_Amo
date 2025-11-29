@@ -96,12 +96,13 @@ CREATE TABLE user_info (
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP      -- 생성 시간
 ) ENGINE=InnoDB;
 
--- User_Insert (사용자 삽입 로그)
-CREATE TABLE user_insert (
+-- user_activity_log  (사용자 삽입 로그)
+CREATE TABLE user_activity_log (
   insert_id INT AUTO_INCREMENT PRIMARY KEY,           -- 로그 PK
   user_id INT,                                        -- 유저 FK
-  table_name VARCHAR(50),                             -- 삽입된 테이블명
-  record_id INT,                                      -- 삽입된 레코드 ID
+  table_name VARCHAR(50),                             -- 작업이 일어난 테이블명
+  record_id INT,                                      -- 테이블 상 삽입된 레코드 ID
+  action_type VARCHAR(20),    						  -- 작업 종류 INSERT / UPDATE / DELETE 를 저장
   created_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP,   -- 삽입 시간
   FOREIGN KEY (user_id) REFERENCES user_info(user_id)
     ON UPDATE CASCADE ON DELETE CASCADE               -- 유저 삭제 시 로그도 삭제
