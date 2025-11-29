@@ -54,7 +54,7 @@ async function loadDisasters() {
     const res = await fetchData('data_manage/read.php', {
         table: 'disasters',
         page: 1,
-        page_size: 2000,
+        page_size: 20000,
         sort_by: 'disaster_id',
         sort_order: 'DESC'
     });
@@ -104,8 +104,9 @@ function renderTable() {
 
     let html = '';
 
-    pageRows.forEach((row) => {
-        const displayNum = row.disaster_id;
+    pageRows.forEach((row, idx) => {
+        // 전체 개수 기준으로 연속 번호 (최신이 가장 큰 번호)
+        const displayNum = startIdx + idx + 1;
         const creatorName = row.creator_name || '-';
         const creatorLoginId = row.creator_login_id || null;
 

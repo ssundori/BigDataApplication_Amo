@@ -3,17 +3,17 @@
 
 header("Content-Type: application/json; charset=utf-8");
 
-require_once __DIR__ . "/../config/auth_check.php";
+require_once __DIR__ . "/../config/auth_check.php";    // 로그인 체크
 require_once __DIR__ . "/../config/db.php";
 
 try {
-    // disasters 에 대한 user_insert + user_info 조인
+    // disasters 에 대한 user_activity_log + user_info 조인
     $sql = "
         SELECT 
             ui.user_login_id,
             ui.user_name,
             u.record_id AS disaster_id
-        FROM user_insert u
+        FROM user_activity_log u
         JOIN user_info ui ON ui.user_id = u.user_id
         WHERE u.table_name = 'disasters'
     ";

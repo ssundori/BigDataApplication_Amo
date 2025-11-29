@@ -6,7 +6,7 @@ error_reporting(E_ALL);
 
 header("Content-Type: application/json; charset=utf-8");
 
-require_once __DIR__ . "/../config/auth_check.php";
+require_once __DIR__ . "/../config/auth_check.php";    // 로그인 체크
 require_once __DIR__ . "/../config/db.php";
 
 $table = "disasters";   // 고정

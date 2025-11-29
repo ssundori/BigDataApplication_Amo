@@ -58,6 +58,36 @@ export async function initAuthUI() {
         }
     });
 
+    const sidebarLink = document.querySelector('.sidebar-login-link');
+    if (sidebarLink) {
+        if (loggedIn) {
+            // 로그인 상태: 유저 이름 + (Logout)
+            sidebarLink.href = '#';  // 클릭하면 로그아웃 처리하게 만들자
+            sidebarLink.innerHTML = `
+                <i class="fas fa-user-circle"></i>
+                <span style="margin-left: 8px;">${userName}</span>
+                <span id="user-info-display" style="margin-left: 8px;"> Logout</span>
+            `;
+
+            sidebarLink.addEventListener('click', async (e) => {
+                e.preventDefault();
+                try {
+                    await fetchData('auth/logout.php');
+                } catch (e) {
+                    console.error('sidebar logout error', e);
+                }
+                window.location.href = '/team18/login.php';
+            });
+        } else {
+            // 비로그인 상태: Login/Sign In 링크 유지
+            sidebarLink.href = '/team18/login.php';
+            sidebarLink.innerHTML = `
+                <i class="fas fa-sign-in-alt"></i> Login/Sign In
+                <span id="user-info-display" style="margin-left: 8px;"></span>
+            `;
+        }
+    }
+
     // Login 클릭 → 로그인 페이지로 이동
     document.querySelectorAll('.btn-auth-login').forEach((btn) => {
         btn.addEventListener('click', () => {

@@ -630,6 +630,7 @@ body {
     font-weight: 700;
     color: #024737;
     margin-bottom: 40px;
+    text-decoration: none !important;
 }
 
 /* 카드 박스 */
