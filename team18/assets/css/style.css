@@ -1,0 +1,700 @@
+/* ===== 기본 설정 ===== */
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background-color: #f8f9fa;  /* 피그마 배경색 느낌 */
+  color: #333;
+}
+
+/* ===== 로그인 / 회원가입 공통 레이아웃 ===== */
+.auth-page {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+}
+
+.auth-container {
+  text-align: center;
+}
+
+.auth-container h1 {
+  font-size: 40px;
+  font-weight: 700;
+  margin-bottom: 40px;
+  color: #004D40;   /* AMO 색 */
+}
+
+/* ===== 카드 (흰 사각형) ===== */
+.auth-card {
+  width: 360px;
+  padding: 32px 36px 28px;
+  background: #ffffff;
+  border-radius: 14px;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.08);
+  margin: 0 auto;
+}
+
+.auth-card h2 {
+  font-size: 28px;
+  font-weight: 700;
+  margin: 0 0 24px 0;
+}
+
+/* ===== 폼 ===== */
+.form-group {
+  margin-bottom: 18px;
+  text-align: left;
+}
+
+.form-group label {
+  display: block;
+  font-size: 12px;
+  color: #555;
+  margin-bottom: 4px;
+}
+
+/* 입력창을 선 하나만 있는 스타일로 */
+.form-group input {
+  width: 100%;
+  border: none;
+  border-bottom: 1px solid #c2c2c2;
+  padding: 8px 2px 6px;
+  font-size: 14px;
+  background: transparent;
+  outline: none;
+}
+
+.form-group input:focus {
+  border-bottom: 1.5px solid #004D40;
+}
+
+/* ===== 버튼 ===== */
+.btn {
+  display: inline-block;
+  width: 100%;
+  border: none;
+  border-radius: 4px;
+  padding: 10px 0;
+  font-size: 14px;
+  cursor: pointer;
+  margin-top: 18px;
+}
+
+.primary-btn {
+  background-color: #004D40;
+  color: #ffffff;
+}
+
+.primary-btn:hover {
+  background-color: #00352c;
+}
+
+/* ===== 아래쪽 링크 영역 (Sign in / forget password) ===== */
+.auth-bottom {
+  margin-top: 14px;
+  display: flex;
+  justify-content: space-between;
+  font-size: 12px;
+}
+
+.auth-bottom a {
+  color: #004D40;
+  text-decoration: none;
+}
+
+.auth-bottom a:hover {
+  text-decoration: underline;
+}
+
+/* ===== 에러 메시지 ===== */
+.error-msg {
+  color: #c62828;
+  font-size: 13px;
+  margin-top: 10px;
+}
+
+/* ===== 나중에 사용할 레이아웃 기본 (대시보드 등) ===== */
+.top-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: #004D40;
+  color: #fff;
+  padding: 8px 16px;
+}
+
+.logo-text {
+  font-weight: bold;
+}
+
+.sidebar {
+  width: 200px;
+  background: #073b3a;
+  color: #fff;
+  min-height: calc(100vh - 40px);
+}
+
+.nav-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.nav-list li a {
+  display: block;
+  padding: 10px 16px;
+  color: #fff;
+  text-decoration: none;
+}
+
+.nav-list li a:hover {
+  background: #0b5351;
+}
+
+.layout {
+  display: flex;
+}
+
+.content {
+  flex: 1;
+  padding: 20px 24px;
+}
+
+.panel {
+  background: #fff;
+  padding: 16px 20px;
+  border-radius: 8px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+  margin-bottom: 20px;
+}
+
+/* ===== Register 전용 레이아웃 ===== */
+.register-page {
+  position: relative;
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background-color: #f8f9fa;
+  height: 100vh;
+}
+
+/* 전체 레이아웃: 가운데 카드 */
+.register-wrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+}
+
+/* 오른쪽 위 AMO 로고 */
+.register-logo {
+  position: absolute;
+  right: 80px;
+  top: 80px;
+  font-size: 40px;
+  font-weight: 700;
+  color: #004D40;
+}
+/* ===== Data Manage - Add New Data 폼 ===== */
+
+.add-form {
+  margin-top: 10px;
+}
+
+.add-form-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr)); /* 2열 */
+  column-gap: 40px;
+  row-gap: 14px;
+}
+
+.add-form-footer {
+  margin-top: 20px;
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 12px;
+}
+
+.add-btn {
+  width: auto;
+  padding: 10px 24px;
+}
+
+/* 성공 메시지 */
+.success-msg {
+  color: #2e7d32;
+  font-size: 13px;
+}
+
+/* Data Manage 활성 메뉴 표시용 */
+.nav-list li a.active {
+  background-color: #b2dfdb;
+  color: #004D40;
+  font-weight: 600;
+}
+
+/* ========================= */
+/*   Data Manage Page 튜닝   */
+/* ========================= */
+
+.data-manage-page .content h2 {
+  font-size: 28px;
+  font-weight: 700;
+  color: #004D40;
+  margin-top: 10px;
+  margin-bottom: 12px;
+}
+
+.data-manage-page .panel {
+  margin-top: 8px;
+  padding-top: 20px;
+  padding-bottom: 24px;
+  border-radius: 14px;
+  box-shadow: 0 8px 18px rgba(0,0,0,0.05);
+}
+
+/* “Add New Data” 제목 간격 */
+.data-manage-page .panel h3 {
+  margin-top: 0;
+  margin-bottom: 18px;
+}
+
+/* 라벨 / 인풋 간격 조금 줄이기 */
+.data-manage-page .form-group {
+  margin-bottom: 12px;
+}
+
+/* Data Manage 폼 안의 select / input을 피그마처럼 카드형으로 */
+.data-manage-page .form-group select,
+.data-manage-page .form-group input[type="number"] {
+  border: 1px solid #d0d0d0;
+  border-radius: 6px;
+  padding: 8px 10px;
+  background-color: #ffffff;
+}
+
+/* placeholder 느낌 줄 수 있게 회색 글씨 */
+.data-manage-page .form-group input::placeholder {
+  color: #b0b0b0;
+  font-size: 12px;
+}
+
+/* 오른쪽 아래 ADD NEW 버튼 위치 & 스타일 */
+.data-manage-page .add-form-footer {
+  margin-top: 24px;
+  padding-right: 6px;
+}
+
+.data-manage-page .add-btn {
+  font-weight: 600;
+  padding: 10px 28px;
+}
+
+/* 사이드바에서 Data Manage 강조 (형광 연두) */
+.sidebar .nav-list li a[href="datamanageadd.php"].active,
+.sidebar .nav-list li a[href="datamanageadd.php"] {
+  background-color: #c5f36a;  /* 피그마처럼 연두색 */
+  color: #004D40;
+  font-weight: 700;
+}
+
+/* ========================= */
+/*   Data Manage - List      */
+/* ========================= */
+
+.data-list-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 14px;
+}
+
+.data-list-toolbar .toolbar-group {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.data-list-toolbar input[type="text"] {
+  border: 1px solid #d0d0d0;
+  border-radius: 4px;
+  padding: 6px 8px;
+  font-size: 13px;
+}
+
+.data-list-toolbar select {
+  border: 1px solid #d0d0d0;
+  border-radius: 4px;
+  padding: 6px 8px;
+  font-size: 13px;
+  background: #fff;
+}
+
+/* 표 스타일 */
+.data-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 10px;
+  font-size: 14px;
+}
+
+.data-table th,
+.data-table td {
+  padding: 10px 12px;
+  text-align: left;
+}
+
+.data-table thead {
+  background: #f5f5f5;
+}
+
+.data-table tbody tr:nth-child(even) {
+  background: #fafafa;
+}
+
+.data-table tbody tr + tr {
+  border-top: 1px solid #eeeeee;
+}
+
+/* Action 버튼 (Show/Edit/Delete) */
+.btn-tag {
+  border: none;
+  border-radius: 4px;
+  font-size: 12px;
+  padding: 4px 8px;
+  cursor: pointer;
+  margin-right: 4px;
+}
+
+.btn-tag.show {
+  background: #1976d2;
+  color: #fff;
+}
+
+.btn-tag.edit {
+  background: #9e9e9e;
+  color: #fff;
+}
+
+.btn-tag.delete {
+  background: #e53935;
+  color: #fff;
+}
+
+.btn-tag.disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+
+/* 페이지네이션 */
+.pagination {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 14px;
+  font-size: 13px;
+}
+
+.page-buttons {
+  display: flex;
+  gap: 4px;
+}
+
+.page-buttons button {
+  border: 1px solid #c0c0c0;
+  background: #fff;
+  border-radius: 4px;
+  padding: 4px 8px;
+  cursor: pointer;
+}
+
+.page-buttons button.active {
+  background: #004D40;
+  color: #fff;
+  font-weight: 600;
+}
+
+/* ========================= */
+/*   Aggression Page 스타일   */
+/* ========================= */
+
+.aggression-page .content h2 {
+  font-size: 28px;
+  font-weight: 700;
+  color: #004D40;
+  margin-top: 10px;
+  margin-bottom: 12px;
+}
+
+.aggression-page .panel {
+  margin-top: 8px;
+  padding-top: 18px;
+  padding-bottom: 22px;
+  border-radius: 14px;
+  box-shadow: 0 8px 18px rgba(0,0,0,0.05);
+}
+
+.analysis-form-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px 40px;
+  margin-bottom: 12px;
+}
+
+.run-btn {
+  margin-top: 10px;
+  width: 120px;
+}
+
+/* 지도 & 범례 */
+.world-map-wrapper {
+  display: flex;
+  gap: 24px;
+  margin-top: 12px;
+  align-items: flex-start;
+}
+
+#worldMap {
+  width: 70%;
+  height: auto;
+  background: #f9f9f9;
+  border-radius: 10px;
+  padding: 10px;
+}
+
+.continent-shape {
+  fill: #e0e0e0;
+}
+
+.continent-label {
+  font-size: 12px;
+  fill: #555;
+}
+
+/* 범례 */
+.legend {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  font-size: 13px;
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.legend-color {
+  width: 18px;
+  height: 18px;
+  border-radius: 4px;
+  border: 1px solid #bbb;
+}
+
+.legend-color.low  { background: #64b5f6; }
+.legend-color.mid  { background: #fff176; }
+.legend-color.high { background: #ef5350; }
+
+.agg-summary-list {
+  margin-top: 14px;
+  padding-left: 18px;
+  font-size: 13px;
+}
+
+/* ========================= */
+/*   Roll-up Page 스타일      */
+/* ========================= */
+
+.rollup-page .content h2 {
+  font-size: 28px;
+  font-weight: 700;
+  color: #004D40;
+  margin-top: 10px;
+  margin-bottom: 12px;
+}
+
+.rollup-page .panel {
+  margin-top: 8px;
+  padding-top: 18px;
+  padding-bottom: 22px;
+  border-radius: 14px;
+  box-shadow: 0 8px 18px rgba(0,0,0,0.05);
+}
+
+/* aggression에서 썼던 analysis-form-grid 재활용 */
+.rollup-page .analysis-form-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px 40px;
+  margin-bottom: 12px;
+}
+
+.rollup-page .run-btn {
+  margin-top: 10px;
+  width: 120px;
+}
+
+.rollup-chart-wrapper {
+  margin-top: 16px;
+}
+
+.rollup-chart-wrapper canvas {
+  max-width: 100%;
+  min-height: 280px;
+}
+
+#rollupChart {
+    max-width: 700px;   /* 가로 길이 */
+    max-height: 300px;  /* 높이 */
+    margin: 0 auto;     /* 가운데 정렬 */
+    display: block;
+}
+
+/* ====== Sidebar Layout ====== */
+
+.layout {
+    display: flex;
+    min-height: 100vh;
+}
+
+/* 왼쪽 전체 사이드바 박스 */
+.sidebar {
+    width: 220px;
+    background-color: #004d40; /* 진한 초록 */
+    color: #ffffff;
+    padding: 40px 20px;
+}
+
+/* AMO 로고 */
+.sidebar-logo {
+    font-size: 20px;
+    font-weight: 700;
+    margin-bottom: 40px;
+}
+
+/* 메뉴 리스트 기본 리셋 */
+.sidebar ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.sidebar li + li {
+    margin-top: 16px;
+}
+
+/* 메뉴 링크 기본 스타일 */
+.sidebar a {
+    display: block;
+    padding: 10px 12px;
+    border-radius: 4px;
+    color: #ffffff;
+    text-decoration: none;
+    font-size: 14px;
+}
+
+    /* 호버 시 */
+    .sidebar a:hover {
+        background-color: #00695c;
+    }
+
+    /* 현재 선택된 메뉴 */
+    .sidebar a.active {
+        background-color: #8BC34A; /* Figma처럼 밝은 연두색 */
+        color: #004d40;
+        font-weight: 600;
+    }
+
+/* -------- 로그인 / 회원가입 공통 레이아웃 -------- */
+
+.auth-page-wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    width: 100%;
+    min-height: 100vh;
+    background: #F5F7FA;
+    padding-top: 100px;
+}
+
+/* 상단 AMO 로고 */
+.auth-logo {
+    font-size: 48px;
+    font-weight: 700;
+    color: #024737;
+    margin-bottom: 40px;
+    text-decoration: none !important;
+}
+
+/* 카드 박스 */
+.auth-card {
+    width: 420px;
+    background: #ffffff;
+    border-radius: 14px;
+    padding: 50px 40px;
+    box-shadow: 0 6px 20px rgba(0,0,0,0.08);
+    text-align: center;
+}
+
+    /* 카드 타이틀 */
+    .auth-card h2 {
+        font-size: 32px;
+        font-weight: 700;
+        color: #1c1c1c;
+        margin-bottom: 35px;
+    }
+
+/* 입력 필드 */
+.auth-input {
+    width: 100%;
+    height: 46px;
+    border: none;
+    border-bottom: 1.4px solid #999;
+    margin-bottom: 26px;
+    background: transparent;
+    font-size: 15px;
+    padding: 6px 0;
+}
+
+    .auth-input:focus {
+        outline: none;
+        border-color: #024737;
+    }
+
+/* 버튼 */
+.auth-btn {
+    width: 100%;
+    height: 44px;
+    border: none;
+    border-radius: 6px;
+    background: #024737;
+    color: white;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    margin-top: 10px;
+}
+
+    .auth-btn:hover {
+        background: #013f32;
+    }
+
+/* 하단 링크 */
+.auth-links {
+    margin-top: 10px;
+    display: flex;
+    justify-content: space-between;
+    font-size: 13px;
+}
+
+    .auth-links a {
+        color: #024737;
+        text-decoration: none;
+    }
