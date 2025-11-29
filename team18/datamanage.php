@@ -1,3 +1,7 @@
+<?php
+require_once __DIR__ . "/api/config/auth_check.php";
+?>
+
 <!DOCTYPE html>
 <html lang="ko">
 <head>
@@ -13,3 +17,4 @@
   <script type="module" src="./fe/js/main.js"></script>
 </body>
 </html>
+

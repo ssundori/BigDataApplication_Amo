@@ -197,3 +197,11 @@ dm-btn-disabled {
         opacity: 0.4;
         pointer-events: none;
     }
+
+dm-add-new-btn {
+    width: 220px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}

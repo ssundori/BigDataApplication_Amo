@@ -1,229 +1,278 @@
 // fe/js/pages/DataManageAddPage.js
 import { fetchData, postData } from '../../utils/api.js';
 
-/** 국가, 재난유형 셀렉트 채우기 */
-async function populateSelects() {
-    const countrySelect = document.getElementById('dm-country');
-    const groupSelect = document.getElementById('dm-disaster-group');
-    const typeSelect = document.getElementById('dm-disaster-type');
+let DISASTER_TYPES = [];
 
-    if (!countrySelect || !groupSelect || !typeSelect) return;
-
+/* ------------------------------------
+   로그인 유저 가져오기
+--------------------------------------*/
+function getLoggedInUser() {
     try {
-        // 국가 목록 (백엔드 common/contries.php 사용)
-        const countryRes = await fetchData('common/contries.php');
-        if (countryRes?.success && Array.isArray(countryRes.data)) {
-            countrySelect.innerHTML =
-                '<option value="">Select Country</option>' +
-                countryRes.data
-                    .map(c => `<option value="${c.id}">${c.name}</option>`)
-                    .join('');
-        }
-
-        // 재난 타입 목록 (group + type 같이 옴)
-        const typeRes = await fetchData('common/disaster_types.php');
-        let disasterTypes = [];
-        if (typeRes?.success && Array.isArray(typeRes.data)) {
-            disasterTypes = typeRes.data;
-        }
-
-        // 그룹 목록 만들기
-        const groups = [...new Set(disasterTypes.map(d => d.group))].filter(Boolean);
-        groupSelect.innerHTML =
-            '<option value="">Group</option>' +
-            groups.map(g => `<option value="${g}">${g}</option>`).join('');
-
-        // 그룹 선택에 따라 type 셀렉트 채우기
-        groupSelect.addEventListener('change', () => {
-            const g = groupSelect.value;
-            const filtered = g
-                ? disasterTypes.filter(d => d.group === g)
-                : disasterTypes;
-
-            typeSelect.innerHTML =
-                '<option value="">Type</option>' +
-                filtered
-                    .map(d => `<option value="${d.id}">${d.type}</option>`)
-                    .join('');
-        });
-
-        // 초기 type 전체
-        typeSelect.innerHTML =
-            '<option value="">Type</option>' +
-            disasterTypes.map(d => `<option value="${d.id}">${d.type}</option>`).join('');
-
+        const stored = sessionStorage.getItem('amoUser');
+        if (!stored) return null;
+        return JSON.parse(stored);
     } catch (e) {
-        console.error('DataManageAdd – select load error', e);
+        console.error(e);
+        return null;
     }
 }
 
-/** 폼 submit 이벤트 */
-function setupFormSubmit() {
-    const form = document.getElementById('dm-add-form');
-    if (!form) return;
-
-    form.addEventListener('submit', async (e) => {
-        e.preventDefault();
-
-        const dataType = (document.getElementById('dm-data-type')?.value || '').toUpperCase();
-        const countryId = document.getElementById('dm-country')?.value || '';
-        const disasterTypeId = document.getElementById('dm-disaster-type')?.value || '';
-        const startYear = document.getElementById('dm-start-year')?.value || '';
-        const endYear = document.getElementById('dm-end-year')?.value || '';
-        const totalDeaths = document.getElementById('dm-total-deaths')?.value || '0';
-        const totalAffected = document.getElementById('dm-total-affected')?.value || '0';
-        const totalDamage = document.getElementById('dm-total-damage')?.value || '0';
-
-        // 기본 validation
-        if (!dataType) {
-            alert('Data Type을 선택해주세요.');
-            return;
-        }
-        if (dataType === 'COUNTRY' && !countryId) {
-            alert('Country를 선택해주세요.');
-            return;
-        }
-        if (!disasterTypeId) {
-            alert('Disaster Type을 선택해주세요.');
-            return;
-        }
-        if (!startYear || !endYear) {
-            alert('시작/종료 연도를 입력해주세요.');
-            return;
-        }
-
-        // 백엔드 create.php에서 기대하는 필드들 추정
-        const payload = {
-            // GLOBAL | COUNTRY (create.php 안에서 유효성 검사에 사용)
-            data_type: dataType,
-
-            // 어떤 테이블에 넣을지 (create.php에서 이 값으로 분기)
-            table: dataType === 'GLOBAL'
-                ? 'global_disasters'
-                : 'country_disasters',
-
-            country_id: dataType === 'GLOBAL'
-                ? null
-                : Number(countryId),
-
-            disaster_type_id: Number(disasterTypeId),
-            start_year: Number(startYear),
-            end_year: Number(endYear),
-            total_deaths: Number(totalDeaths) || 0,
-            total_affected: Number(totalAffected) || 0,
-            total_damage_thousand_usd: Number(totalDamage) || 0
-        };
-
-        try {
-            const res = await postData('data_manage/create.php', payload);
-
-            // create.php에서
-            // { status: "success", message: "...", data: { id: ... } }
-            // 이런 식으로 내려준다고 가정
-            if (res?.status === 'success') {
-                alert('데이터가 성공적으로 추가되었습니다.');
-                // 리스트 페이지로 이동
-                window.location.href = 'datamanage.php';
-            } else {
-                const msg =
-                    res?.message ||
-                    res?.error ||
-                    '데이터 추가 중 오류가 발생했습니다.';
-                alert(msg);
-            }
-        } catch (err) {
-            console.error('DataManageAdd – create error', err);
-            alert('서버 통신 중 오류가 발생했습니다.');
-        }
-    });
+/* ------------------------------------
+    URL에서 ?id= 추출 → edit 모드 판단
+--------------------------------------*/
+function getEditingId() {
+    const params = new URLSearchParams(window.location.search);
+    const id = params.get('id');
+    return id ? Number(id) : null;
 }
 
-export function render() {
-    // datamanageadd.php에서 이 HTML이 app-root에 들어감
-    const html = `
-    <div class="page-header">
-      <h1><i class="fas fa-database"></i> Data Manage Page</h1>
-      <div class="login-icon"><i class="fas fa-user-circle"></i> Login</div>
-    </div>
+/* ------------------------------------
+    국가 리스트 불러오기
+--------------------------------------*/
+async function populateCountries() {
+    const el = document.getElementById('dm-add-country');
+    el.innerHTML = '<option value="">Select Country</option>';
 
-    <div class="card">
-      <h2>Add New Data</h2>
+    const res = await fetchData('common/countries.php');
+    if (!res?.success) return;
 
-      <form id="dm-add-form" class="dm-add-grid">
-        <div class="dm-field">
-          <label for="dm-data-type" class="form-label">Data Type</label>
-          <select id="dm-data-type">
-            <option value="GLOBAL">Global Disaster</option>
-            <option value="COUNTRY">Country Disaster</option>
-          </select>
-        </div>
+    let html = '<option value="">Select Country</option>';
+    res.data.forEach(c => {
+        html += `<option value="${c.id}">${c.name}</option>`;
+    });
+    el.innerHTML = html;
+}
 
-        <div class="dm-field">
-          <label for="dm-country" class="form-label">Country</label>
-          <select id="dm-country">
-            <option value="">Select Country</option>
-          </select>
-        </div>
+/* ------------------------------------
+    재해 타입 불러오기
+--------------------------------------*/
+async function loadDisasterTypes() {
+    const res = await fetchData('common/disaster_types.php');
+    if (res?.success) DISASTER_TYPES = res.data;
+}
 
-        <div class="dm-field">
-          <label class="form-label">Disaster Type</label>
-          <div class="dm-disaster-type-wrapper">
-            <select id="dm-disaster-group">
-              <option value="">Group</option>
-            </select>
-            <select id="dm-disaster-type">
-              <option value="">Type</option>
-            </select>
-          </div>
-        </div>
+function populateDisasterGroups() {
+    const el = document.getElementById('dm-add-disaster-group');
+    const groups = [...new Set(DISASTER_TYPES.map(d => d.group))];
 
-        <div class="dm-field">
-          <label class="form-label">Start Year</label>
-          <input type="number" id="dm-start-year" min="1980" max="2025" value="2000">
-        </div>
+    let html = '<option value="">Group</option>';
+    groups.forEach(g => html += `<option value="${g}">${g}</option>`);
+    el.innerHTML = html;
+}
 
-        <div class="dm-field">
-          <label class="form-label">End Year</label>
-          <input type="number" id="dm-end-year" min="1980" max="2025" value="2000">
-        </div>
+function populateDisasterTypesByGroup(group) {
+    const el = document.getElementById('dm-add-disaster-type');
+    if (!group) {
+        el.innerHTML = '<option value="">Type</option>';
+        return;
+    }
 
-        <div class="dm-field">
-          <label class="form-label">Total deaths</label>
-          <input type="number" id="dm-total-deaths" placeholder="ex) 100">
-        </div>
+    const list = DISASTER_TYPES.filter(d => d.group === group);
 
-        <div class="dm-field">
-          <label class="form-label">Total affected (People)</label>
-          <input type="number" id="dm-total-affected" placeholder="ex) 50000">
-        </div>
+    let html = '<option value="">Type</option>';
+    list.forEach(d => html += `<option value="${d.id}">${d.type}</option>`);
+    el.innerHTML = html;
+}
 
-        <div class="dm-field full-width">
-          <label class="form-label">Total damaged (1000 Dollar)</label>
-          <input type="number" id="dm-total-damage" placeholder="ex) 1000">
-        </div>
+/* ------------------------------------------------------
+    EDIT MODE: detail.php로 기존 데이터 로딩
+-------------------------------------------------------*/
+async function loadInitialData(editingId) {
 
-        <div class="dm-add-actions">
-          <button type="button" id="dm-add-cancel" class="btn btn-secondary">Cancel</button>
-          <button type="submit" class="btn btn-primary">
-            <i class="fas fa-plus-circle"></i> ADD NEW
-          </button>
-        </div>
-      </form>
-    </div>
-  `;
+    const res = await fetchData('data_manage/detail.php', { id: editingId });
 
-    // 렌더 후 셀렉트/이벤트 세팅
-    setTimeout(() => {
-        populateSelects();
-        setupFormSubmit();
+    if (!res || res.status !== "success") {
+        console.error("detail load failed", res);
+        return;
+    }
 
-        const cancelBtn = document.getElementById('dm-add-cancel');
-        if (cancelBtn) {
-            cancelBtn.addEventListener('click', () => {
-                window.location.href = 'datamanage.php';
-            });
+    const d = res.data;
+
+    document.getElementById('dm-add-country').value = d.country_id;
+    document.getElementById('dm-add-start-year').value = d.start_year;
+    document.getElementById('dm-add-end-year').value = d.end_year;
+    document.getElementById('dm-add-total-deaths').value = d.total_deaths;
+    document.getElementById('dm-add-total-affected').value = d.total_affected;
+    document.getElementById('dm-add-total-damage').value = d.total_damage_thousand_usd;
+
+    // group/type 자동 세팅
+    const type = DISASTER_TYPES.find(t => t.id == d.disaster_type_id);
+    if (type) {
+        document.getElementById('dm-add-disaster-group').value = type.group;
+        populateDisasterTypesByGroup(type.group);
+        document.getElementById('dm-add-disaster-type').value = d.disaster_type_id;
+    }
+
+    // UI 텍스트 변경
+    document.querySelector('#dm-add-form-root h2').textContent = "Edit Data";
+    document.getElementById('dm-add-submit').textContent = "Save Changes";
+}
+
+/* ------------------------------------------------------
+    ADD / EDIT SUBMIT
+-------------------------------------------------------*/
+async function handleSubmit() {
+    const errorEl = document.getElementById('dm-add-error');
+    errorEl.textContent = "";
+
+    const country = document.getElementById('dm-add-country').value;
+    const group = document.getElementById('dm-add-disaster-group').value;
+    const type = document.getElementById('dm-add-disaster-type').value;
+
+    const startYear = Number(document.getElementById('dm-add-start-year').value);
+    const endYear = Number(document.getElementById('dm-add-end-year').value);
+    const deaths = Number(document.getElementById('dm-add-total-deaths').value || 0);
+    const affected = Number(document.getElementById('dm-add-total-affected').value || 0);
+    const damage = Number(document.getElementById('dm-add-total-damage').value || 0);
+
+    if (!country || !group || !type) {
+        errorEl.textContent = "필수 항목을 모두 입력하세요.";
+        return;
+    }
+
+    if (startYear > endYear) {
+        errorEl.textContent = "시작 연도는 종료 연도보다 클 수 없습니다.";
+        return;
+    }
+
+    const editingId = getEditingId();
+
+    // 백엔드 필드명과 100% 맞춤
+    const payload = {
+        country_id: Number(country),
+        disaster_type_id: Number(type),
+        start_year: startYear,
+        end_year: endYear,
+        total_deaths: deaths,
+        total_affected: affected,
+        total_damage_thousand_usd: damage
+    };
+
+    let endpoint = "";
+
+    if (editingId) {
+        // UPDATE
+        endpoint = `data_manage/update.php?table=disasters&id=${editingId}`;
+    } else {
+        // CREATE
+        endpoint = "data_manage/create.php";
+    }
+
+    const res = await postData(endpoint, payload);
+
+    console.log("SUBMIT RESPONSE:", res);
+
+    if (!res || res.status !== "success") {
+        errorEl.textContent = res?.error?.message || "서버 오류";
+        return;
+    }
+
+    alert(editingId ? "데이터가 수정되었습니다." : "데이터가 추가되었습니다.");
+    window.location.href = "datamanage.php";
+}
+
+/* ------------------------------------------------------
+    페이지 초기화
+-------------------------------------------------------*/
+function initDataManageAddPage() {
+    (async () => {
+        await Promise.all([loadDisasterTypes(), populateCountries()]);
+
+        populateDisasterGroups();
+        populateDisasterTypesByGroup("");
+
+        const editingId = getEditingId();
+        if (editingId) {
+            await loadInitialData(editingId);
         }
-    }, 0);
 
+        // 이벤트
+        document.getElementById('dm-add-disaster-group')
+            .addEventListener('change', e => populateDisasterTypesByGroup(e.target.value));
+
+        document.getElementById('dm-add-submit')
+            .addEventListener('click', e => {
+                e.preventDefault();
+                handleSubmit();
+            });
+
+        document.getElementById('dm-add-cancel')
+            .addEventListener('click', () => window.location.href = "datamanage.php");
+    })();
+}
+
+/* ------------------------------------------------------
+    렌더링
+-------------------------------------------------------*/
+export function render() {
+    const html = `
+        <div class="page-header" style="display:flex; justify-content:space-between;align-items:center; margin-bottom:var(--spacing-lg); padding-bottom:8px; border-bottom:1px solid #ddd;">
+            <h1 style="color:var(--color-primary);">
+                <i class="fas fa-database" style="margin-right:10px;"></i>
+                Data Manage Page
+            </h1>
+            <div class="js-auth-area"></div>
+        </div>
+
+        <div class="card" id="dm-add-form-root" style="max-width:820px;">
+            <h2 style="margin-bottom:var(--spacing-md); color:var(--color-primary);">Add New Data</h2>
+
+            <form id="dm-add-form" class="settings-grid" style="
+                display:grid;
+                grid-template-columns:200px 1fr;
+                row-gap:10px;
+                column-gap:16px;
+                align-items:center;
+            ">
+
+                <label>Country</label>
+                <select id="dm-add-country" style="padding:6px; max-width:260px;">
+                    <option value="">Loading...</option>
+                </select>
+
+                <label>Disaster Type</label>
+                <div style="display:flex; gap:8px;">
+                    <select id="dm-add-disaster-group" style="padding:6px; flex:1;">
+                        <option value="">Group</option>
+                    </select>
+                    <select id="dm-add-disaster-type" style="padding:6px; flex:1;">
+                        <option value="">Type</option>
+                    </select>
+                </div>
+
+                <label>Start Year / End Year</label>
+                <div style="display:flex; gap:8px;">
+                    <input type="number" id="dm-add-start-year" value="2000" style="width:90px;">
+                    <span>~</span>
+                    <input type="number" id="dm-add-end-year" value="2000" style="width:90px;">
+                </div>
+
+                <label>Total deaths</label>
+                <input type="number" id="dm-add-total-deaths" style="padding:6px; max-width:260px;">
+
+                <label>Total affected</label>
+                <input type="number" id="dm-add-total-affected" style="padding:6px; max-width:260px;">
+
+                <label>Total damaged (1000 Dollar)</label>
+                <input type="number" id="dm-add-total-damage" style="padding:6px; max-width:260px;">
+
+                <div style="grid-column:1 / -1; margin-top:16px;">
+                    <p id="dm-add-error" style="color:#DC3545; font-size:0.9rem;"></p>
+
+                    <div style="display:flex; gap:8px;">
+                        <button id="dm-add-cancel" class="btn btn-secondary" type="button" style="min-width:120px;">Cancel</button>
+                        <button id="dm-add-submit" class="btn btn-nav" type="submit" style="flex:1;">+ ADD NEW</button>
+                    </div>
+                </div>
+
+            </form>
+        </div>
+    `;
+
+    setTimeout(() => initDataManageAddPage(), 0);
     return html;
+}
+
+export async function loadData() {
+    return;
 }

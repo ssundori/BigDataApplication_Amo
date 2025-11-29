@@ -1,11 +1,12 @@
 <?php
 // team18/api/data_manage/create.php
 
-ini_set("display_errors", 1);
+ob_start();  // ★ PHP warning을 숨겨 JSON 깨짐 방지
+ini_set("display_errors", 0);
 error_reporting(E_ALL);
 
-header("Content-Type: application/json; charset=utf-8");
 
+header("Content-Type: application/json; charset=utf-8");
 require_once __DIR__ . "/../config/auth_check.php";    // 로그인 체크
 require_once __DIR__ . "/../config/db.php";            // DB 연결
 
@@ -84,14 +85,13 @@ try {
 
     // user_insert 로그 INSERT
     $sql2 = "
-        INSERT INTO user_insert (user_id, table_name, record_id)
-        VALUES (?, 'disasters', ?)
+        INSERT INTO user_activity_log (user_id, table_name, record_id, action_type)
+        VALUES (?, 'disasters', ?, 'Insert')
     ";
     $stmt2 = $mysqli->prepare($sql2);
     $stmt2->bind_param("ii", $user_id, $new_id);
     $stmt2->execute();
 
-    // 커밋
     $mysqli->commit();
 
     echo json_encode([
@@ -110,8 +110,6 @@ try {
     ]);
 
 } catch (Exception $e) {
-
-    // 롤백
     $mysqli->rollback();
 
     echo json_encode([

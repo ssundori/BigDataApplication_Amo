@@ -6,7 +6,7 @@ error_reporting(E_ALL);
 
 header("Content-Type: application/json; charset=utf-8");
 
-require_once __DIR__ . "/../config/auth_check.php";   // 로그인 체크
+require_once __DIR__ . "/../config/auth_check.php";    // 로그인 체크
 require_once __DIR__ . "/../config/db.php";           // DB 연결
 
 // GET 파라미터 수집
@@ -65,8 +65,8 @@ try {
 
     // 로그 저장
     $sql2 = "
-        INSERT INTO user_insert (user_id, table_name, record_id)
-        VALUES (?, ?, ?)
+        INSERT INTO user_activity_log (user_id, table_name, record_id, action_type)
+        VALUES (?, ?, ?, 'Delete')
     ";
     $stmt2 = $mysqli->prepare($sql2);
     $stmt2->bind_param("isi", $user_id, $table, $id);
