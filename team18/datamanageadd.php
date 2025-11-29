@@ -2,7 +2,6 @@
 require_once __DIR__ . "/api/config/auth_check.php";
 ?>
 
-
 <!DOCTYPE html>
 <html lang="ko">
 <head>
@@ -20,3 +19,4 @@ require_once __DIR__ . "/api/config/auth_check.php";
     <script type="module" src="./fe/js/main.js"></script>
 </body>
 </html>
+

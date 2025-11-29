@@ -52,7 +52,7 @@ $sql = "
     SELECT 
         c.country_id,
         c.country_name,
-        dt.disaster_type,
+        dt.disaster_subtype as disaster_type,
         SUM(d.$rank_by) AS measure_value
     FROM disasters d
     JOIN country c ON d.country_id = c.country_id
@@ -79,7 +79,7 @@ if ($disaster_type_id !== null) {
 
 // 그룹/정렬/Top 10
 $sql .= "
-    GROUP BY c.country_id, c.country_name, dt.disaster_type
+    GROUP BY c.country_id, c.country_name, dt.disaster_subtype
     ORDER BY measure_value DESC
     LIMIT 10
 ";
